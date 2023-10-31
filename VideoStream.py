@@ -5,8 +5,8 @@ import asyncio
 import nest_asyncio
 nest_asyncio.apply()
 from concurrent.futures import ThreadPoolExecutor
-from VideoCaptureThreading import VideoCaptureThreading
 import apikey
+import threading
 
 import pandas as pd
 import numpy as np
@@ -24,22 +24,42 @@ def sort_emotions(emotions):
 def sort_results(results):
     results.apply(lambda x: sort_emotions(x["emotions"]),axis=1)
     print(results)
-def run_in_executor_blocking(func, *args):
+
+async def run_in_executor_blocking(func, *args):
+
+    #     # Create thread
+#     # thread = threading.Thread(target=asyncio.run_coroutine_threadsafe,args=(humeCall(), loop))
+#     thread = threading.Thread(target=run_async)
+#     thread.start()
+
+#     # Wait for API thread to finish
+#     thread.join()
+    print("Run in Executor Blocking")
     loop = asyncio.get_event_loop()
-    return loop.run_in_executor(ThreadPoolExecutor(), func, *args)
-    
+    return await loop.run_in_executor(ThreadPoolExecutor(), func, *args)
+
+def handleHumeCall():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(humeCall())
+    loop.close()
+
 async def humeCall():
     print("Hume Call Start")
     client = HumeStreamClient(API_KEY)
     config = FaceConfig(identify_faces=True)
     
     async with client.connect([config]) as socket:
-        result =  await socket.send_file(FILE_PATH)
-    
-    print(f"File Path = {FILE_PATH}")
-    
+        result = await socket.send_file(FILE_PATH)
 
-    # print(result)
+    print(f"File Path = {FILE_PATH}")
+
+    # async with client.connect([config]) as socket:
+    #     result =  await socket.send_file(FILE_PATH)
+    
+    # print(f"File Path = {FILE_PATH}")
+    
     try:
         results = result["face"]["predictions"]
     except:
@@ -55,6 +75,65 @@ async def humeCall():
     print(extracted_results)
     return extracted_results
 
+
+
+# def hume_thread():
+#     print("Hume Thread Start")
+
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+
+#     # Create a Future to wait for the result
+#     result_future = asyncio.Future()
+
+#     def run_async():
+#         try:
+#             result = loop.run_until_complete(loop.run_in_executor(None, humeCall))
+#             loop.call_soon_threadsafe(result_future.set_result, result)
+#         except Exception as e:
+#             loop.call_soon_threadsafe(result_future.set_exception, e)
+
+#     # Create thread
+#     # thread = threading.Thread(target=asyncio.run_coroutine_threadsafe,args=(humeCall(), loop))
+#     thread = threading.Thread(target=run_async)
+#     thread.start()
+
+#     # Wait for API thread to finish
+#     thread.join()
+
+    
+# async def humeCall():
+#     print("Hume Call Start")
+#     client = HumeStreamClient(API_KEY)
+#     config = FaceConfig(identify_faces=True)
+    
+#     loop = asyncio.get_event_loop()
+#     async with client.connect([config]) as socket:
+#         future = loop.run_in_executor(None, socket.send_file, FILE_PATH)
+#         result = await future
+
+#     print(f"File Path = {FILE_PATH}")
+
+#     # async with client.connect([config]) as socket:
+#     #     result =  await socket.send_file(FILE_PATH)
+    
+#     # print(f"File Path = {FILE_PATH}")
+    
+#     try:
+#         results = result["face"]["predictions"]
+#     except:
+#         print("No Faces Detected")
+#         results = {}
+
+#     # print(results)
+
+#     global extracted_results
+#     extracted_results = pd.json_normalize(results)
+        
+#     sort_results(extracted_results)
+#     print(extracted_results)
+#     return extracted_results
+
 def startWebcam():
     # Open the webcam (you may need to change the argument to the appropriate camera index)
     cap = cv2.VideoCapture(0)
@@ -65,12 +144,15 @@ def startWebcam():
     videoHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     return cap, fourcc, videoWidth, videoHeight
-async def start_video(video_id,fourcc, videoWidth, videoHeight):
+
+def start_video(video_id,fourcc, videoWidth, videoHeight):
     return cv2.VideoWriter(f'./.mp4/output_{video_id}.mp4', fourcc, 60.0, (videoWidth, videoHeight))
+
+
 async def process_video(cap, fourcc, videoWidth, videoHeight):
     start_time = time.time()
     video_id = 0
-    out = cv2.VideoWriter(f'./.mp4/output_{video_id}.mp4', fourcc, 60.0, (videoWidth, videoHeight))
+    out = start_video(video_id, fourcc, videoWidth, videoHeight)
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -88,16 +170,19 @@ async def process_video(cap, fourcc, videoWidth, videoHeight):
             video_id += 1
             start_time = time.time()
 
-            humeTask = await asyncio.gather(start_video(video_id, fourcc, videoWidth, videoHeight),humeCall())
+            out = start_video(video_id, fourcc, videoWidth, videoHeight)
 
-        
-            out = humeTask[0]
+            thread = threading.Thread(target=handleHumeCall)
+            thread.start()
+
+            # humeTask = await asyncio.gather(start_video(video_id, fourcc, videoWidth, videoHeight),hume_thread())        
+            # out = humeTask[0]
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     cap.release()
-    out.release()
+    # out.release()
     cv2.destroyAllWindows()
 
 

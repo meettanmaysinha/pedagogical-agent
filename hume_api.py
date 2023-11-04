@@ -15,6 +15,9 @@ class HumeAPI:
 
     def get_file_path(self):
         return self.FILE_PATH
+    
+    def print_results(self):
+        print(self.extracted_results["top3_emotions"])
 
     def handle_hume_call(self):
         loop = asyncio.new_event_loop()
@@ -31,8 +34,10 @@ class HumeAPI:
             result = await socket.send_file(self.FILE_PATH)
 
         print(f"File Path = {self.FILE_PATH}")
-
+        # print("Raw results")
+        # print(result) # Testing results
         try:
+            # print("\n \n Extracted results")
             results = result["face"]["predictions"]
         except:
             print("No Faces Detected")
@@ -41,20 +46,23 @@ class HumeAPI:
         self.extracted_results = pd.json_normalize(results)
 
         self.sort_results(self.extracted_results)
-        print(self.extracted_results)
+        self.extract_emotions()
+
+        self.print_results()
         return self.extracted_results
 
     def sort_results(self, results):
         results.apply(lambda x: self.sort_emotions(x["emotions"]), axis=1)
-        print(results)
 
     def sort_emotions(self, emotions):
         emotions.sort(key=lambda x: x['score'], reverse=True)
 
     def extract_emotions(self):
+        self.extracted_results["top3_emotions"] = self.extracted_results.apply(lambda x: x["emotions"][:3],axis=1)
         self.extracted_results["emotion1"] = self.extracted_results.apply(lambda x: x["emotions"][0]["name"],axis=1)
         self.extracted_results["emotion1_score"] = self.extracted_results.apply(lambda x: x["emotions"][0]["score"],axis=1)
         self.extracted_results["emotion2"] = self.extracted_results.apply(lambda x: x["emotions"][1]["name"],axis=1)
         self.extracted_results["emotion2_score"] = self.extracted_results.apply(lambda x: x["emotions"][1]["score"],axis=1)
         self.extracted_results["emotion3"] = self.extracted_results.apply(lambda x: x["emotions"][2]["name"],axis=1)
         self.extracted_results["emotion3_score"] = self.extracted_results.apply(lambda x: x["emotions"][2]["score"],axis=1)
+        self.print_results()

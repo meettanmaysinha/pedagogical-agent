@@ -1,3 +1,5 @@
 apikey.py
 .DS_Store
 *.mp4
+*.csv
+*.pyc

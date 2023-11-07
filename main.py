@@ -1,6 +1,6 @@
 # main.py
 import asyncio
-from video_processor import VideoProcessor
+from VideoProcessor import VideoProcessor
 import apikey
 
 API_KEY = apikey.API_KEY

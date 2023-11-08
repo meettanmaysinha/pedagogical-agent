@@ -25,13 +25,13 @@ class HumeAPI:
     def write_results(self):
         self.extracted_results.to_csv("results.csv", mode='a')  
 
-    def handle_hume_call(self):
+    def handle_hume_call(self, video_id=-1):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.hume_call())
+        loop.run_until_complete(self.hume_call(video_id))
         loop.close()
 
-    async def hume_call(self):
+    async def hume_call(self,video_id=-1):
         print("Hume Call Start")
         client = HumeStreamClient(self.API_KEY)
         config = FaceConfig(identify_faces=True)
@@ -56,13 +56,20 @@ class HumeAPI:
 
         self.aggregate_emotions()
         # print(self.aggregated_results)
-
-        self.results_to_csv(self.extracted_results, "extracted_emotions.csv")
-        self.results_to_csv(self.aggregated_results, "aggregated_emotions.csv")
         
+
+        # Attach video id to results to determine sequence of videos
+        self.extracted_results["video_id"] = video_id
+        self.aggregated_results["video_id"] = video_id
+
+        self.results_to_csv(self.extracted_results, "extracted_emotions.csv", mode="a")
+        self.results_to_csv(self.aggregated_results, "aggregated_emotions.csv", mode="a")
+
+        self.save_sequence(sequences=4)
+
         return self.extracted_results
 
-    def results_to_csv(self, dataframe, file_path):
+    def results_to_csv(self, dataframe, file_path, mode='a'):
         # Check if the file already exists
         try:
             # Read the first row of the existing file
@@ -73,7 +80,7 @@ class HumeAPI:
             headers_exist = pd.notna(pd.read_csv(file_path, nrows=0).columns).any()
 
             # Write the DataFrame to the file without headers if they already exist
-            dataframe.to_csv(file_path, mode='a', header=not headers_exist, index=False)
+            dataframe.to_csv(file_path, mode=mode, header=not headers_exist, index=False)
 
         except:
             # If the file doesn't exist, write the DataFrame with headers
@@ -130,4 +137,26 @@ class HumeAPI:
         self.aggregated_results = aggregated_results.merge(emotion_sequence, on="face_id", how="left")
         print(self.aggregated_results)
 
-
+    # Currently inefficient, rewrites the entire column per iteration
+    def save_sequence(self, sequences):
+        # sequences = self.aggregated_results["sequence"]
+        # try:
+            collated_results = pd.read_csv("aggregated_emotions.csv")
+            # Initialise column sequence
+            collated_results["emotion_sequence"] = ""
+            print("TEST")
+            if len(collated_results) >= sequences:
+                for i in range(len(collated_results)):
+                    collated_results.loc[i,["emotion_sequence"]] = collated_results.loc[max(0, i - sequences + 1):i + 1,["highest_scored_emotion"]].values.tolist() 
+                    # self.aggregated_results.loc[i,"emotion_sequence"] = ','.join(self.aggregated_results.loc[i,"emotion_sequence"])
+                    # print((max(0, i - sequences + 1),i + 1) )
+                # self.aggregated_results["emotion_sequence"] = self.aggregated_results["highest_scored_emotion"].rolling(window=4, min_periods=1).apply(lambda x: ','.join(x), raw=False)
+                collated_results.to_csv("aggregated_emotions.csv", index=False)
+                print("COLLATED RESULTS")
+                print(collated_results)
+            else:
+                print("Not enough rows to get sequence")
+        # except Exception as e:
+        #     print("ERROR")
+        #     print(e)
+        #     pass

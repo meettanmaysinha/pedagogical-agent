@@ -37,7 +37,7 @@ class VideoProcessor:
                 out = self.webcam.start_video_writer(video_id)
 
                 # Run Hume API in a separate thread
-                thread = threading.Thread(target=self.hume_api.handle_hume_call)
+                thread = threading.Thread(target=self.hume_api.handle_hume_call, args=[video_id])
                 thread.start()
 
             if cv2.waitKey(1) & 0xFF == ord('q'):

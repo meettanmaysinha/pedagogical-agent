@@ -3,6 +3,7 @@
 
 import os
 import pandas as pd
+from emotions_dict import emotions_sequence_map
 
 class PatternMine:
     def __init__(self, algorithm="PrefixSpan", minsup=0.7, minpat=10):
@@ -10,11 +11,18 @@ class PatternMine:
         self.minsup = minsup
         self.minpat = minpat    
 
+
     def run(self, input_filename, output_filename):
+        # Append at front of file
+        with open('extracted_sequence.txt', 'a') as f:
+            # Move the file pointer to the beginning of the file
+            f.seek(0)
+            # Write the Emotions decoder to the file
+            f.write(emotions_sequence_map)
+
         # Run PrefixSpan algorithm from the command line, then writes to output file
         os.system(f"java -jar spmf.jar run {self.algorithm} {input_filename} {output_filename} {self.minsup} {self.minpat}")
 
-        # return pd.read_csv("{output_filename}", header=None, sep= "-1")
 
     def print_results(self, file_name):
         # Read the output file line by line
@@ -26,3 +34,4 @@ class PatternMine:
 
 # pattern = PatternMine("PrefixSpan", 0.7, 5)
 # pattern.run("contextPrefixSpan.txt", "output.txt")
+

@@ -7,9 +7,10 @@ from Hume import HumeAPI
 from Webcam import Webcam
 
 class VideoProcessor:
-    def __init__(self, api_key, file_path="../output_0"):
+    def __init__(self, api_key, file_path="../output_0", interval=5):
         self.hume_api = HumeAPI(api_key, file_path) # Create instane of HumeAPI
         self.webcam = Webcam() # Create instance of Webcam
+        self.interval = interval
 
     def start_webcam(self):
         self.webcam.start()
@@ -24,7 +25,7 @@ class VideoProcessor:
             out.write(frame)
             cv2.imshow('Webcam Feed', frame)
 
-            if time.time() - start_time > 5:
+            if time.time() - start_time > self.interval:
                 out.release()
                 print(f"Run: {video_id}")
 

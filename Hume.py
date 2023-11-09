@@ -21,7 +21,7 @@ class HumeAPI:
         return self.FILE_PATH
     
     def print_results(self):
-        print(self.extracted_results["top3_emotions"])
+        print(self.aggregated_results.loc[:, ["most_common_emotion","highest_scored_emotion","emotion_score"]])
     
     def write_results(self):
         self.extracted_results.to_csv("results.csv", mode='a')  
@@ -49,10 +49,10 @@ class HumeAPI:
             self.sort_results(self.extracted_results)
             self.extract_emotions()
 
-            self.print_results()
-
             self.aggregate_emotions()
 
+            self.print_results()
+            
             # Attach video id to results to determine sequence of videos
             self.extracted_results["video_id"] = video_id
             self.aggregated_results["video_id"] = video_id
@@ -137,7 +137,6 @@ class HumeAPI:
             # Join the two results together
             self.aggregated_results = highest_scored_emotion.merge(most_common_emotion, on="face_id", how="left")
 
-            print(self.aggregated_results)
         
         except:
             pass # No faces detected
@@ -152,7 +151,6 @@ class HumeAPI:
                 if len(collated_results) >= sequences:
                     for i in range(len(collated_results)):
                         collated_results.loc[i,["emotion_sequence"]] = collated_results.loc[max(0, i - sequences + 1):i + 1,["highest_scored_emotion"]].values.tolist() 
-                        print(collated_results.loc[i,["emotion_sequence"]])
                         for j in collated_results.loc[i,["emotion_sequence"]]:
                             for index, k in enumerate(j):
                                 j[index] = self.map_emotions(k) # Map emotions to an emotion ID for PatternMine

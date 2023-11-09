@@ -1,0 +1,5 @@
+hume==0.4.1
+numpy==1.23.0
+opencv_python==4.8.1.78
+pandas==1.4.2
+# pyaudio==0.2.14 # For audio input

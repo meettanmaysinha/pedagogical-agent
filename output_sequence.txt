@@ -1,6 +1,4 @@
-10 -1 #SUP: 17
-10 -1 12 -1 #SUP: 12
-12 -1 #SUP: 21
-12 -1 12 -1 #SUP: 17
-12 -1 12 -1 12 -1 #SUP: 15
-12 -1 12 -1 12 -1 12 -1 #SUP: 12
+Boredom | #SUP: 55
+Boredom | Boredom | #SUP: 51
+Boredom | Boredom | Boredom | #SUP: 43
+Concentration | #SUP: 32

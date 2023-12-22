@@ -1,5 +1,8 @@
-# Resource
+# Resources
 # https://data-mining.philippe-fournier-viger.com/tutorial-how-to-call-spmf-from-python/
+
+# Documentation
+# https://www.philippe-fournier-viger.com/spmf/PrefixSpan.php
 
 import os
 import pandas as pd

@@ -128,5 +128,3 @@ Boredom | Boredom | Boredom | Boredom | #SUP: 27
 # Resources
 
 [SPMF PrefixSpan Documentation](https://www.philippe-fournier-viger.com/spmf/PrefixSpan.php)
-
-

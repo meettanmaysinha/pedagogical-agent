@@ -25,7 +25,8 @@ class VideoProcessor:
             out.write(frame)
             cv2.imshow('Webcam Feed', frame)
 
-            if time.time() - start_time > self.interval:
+            # If video length longer than interval set, save video
+            if time.time() - start_time > self.interval: 
                 out.release()
                 print(f"Run: {video_id}")
 

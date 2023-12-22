@@ -10,48 +10,91 @@ import os
 
 class VideoRecorder():  
         "Video class based on openCV"
-        def __init__(self, name="temp_video.avi", fourcc="MJPG", sizex=640, sizey=480, camindex=0, fps=30):
-            self.open = True
-            self.device_index = camindex
-            self.fps = fps                  # fps should be the minimum constant rate at which the camera can
-            self.fourcc = fourcc            # capture images (with no decrease in speed over time; testing is required)
-            self.frameSize = (sizex, sizey) # video formats and sizes also depend and vary according to the camera used
-            self.video_filename = name
-            self.video_cap = cv2.VideoCapture(self.device_index)
-            self.video_writer = cv2.VideoWriter_fourcc(*self.fourcc)
-            self.video_out = cv2.VideoWriter(self.video_filename, self.video_writer, self.fps, self.frameSize)
-            self.frame_counts = 1
+        def __init__(self, fps=60):
             self.start_time = time.time()
+            self.cap = cv2.VideoCapture(0)
+            self.fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+            self.video_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            self.video_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        
+        # def record(self):
+        #     "Video starts being recorded"
+        #     # counter = 1
+        #     timer_start = time.time()
+        #     timer_current = 0
+        #     while self.is_opened():
+        #         ret, video_frame = self.cap.read()
+        #         if ret:
+        #             self.out.write(video_frame)
+        #             # print(str(counter) + " " + str(self.frame_counts) + " frames written " + str(timer_current))
+        #             self.frame_counts += 1
+        #             # counter += 1
+        #             # timer_current = time.time() - timer_start
+        #             time.sleep(1/self.fps)
+        #             # gray = cv2.cvtColor(video_frame, cv2.COLOR_BGR2GRAY)
+        #             # cv2.imshow('video_frame', gray)
+        #             # cv2.waitKey(1)
+        #         else:
+        #             break
 
-        def record(self):
-            "Video starts being recorded"
-            # counter = 1
-            timer_start = time.time()
-            timer_current = 0
-            while self.open:
-                ret, video_frame = self.video_cap.read()
-                if ret:
-                    self.video_out.write(video_frame)
-                    # print(str(counter) + " " + str(self.frame_counts) + " frames written " + str(timer_current))
-                    self.frame_counts += 1
-                    # counter += 1
-                    # timer_current = time.time() - timer_start
-                    time.sleep(1/self.fps)
-                    # gray = cv2.cvtColor(video_frame, cv2.COLOR_BGR2GRAY)
-                    # cv2.imshow('video_frame', gray)
-                    # cv2.waitKey(1)
-                else:
+
+#########################################################################################################
+                
+        def record_video(self, interval = 5):
+            start_time = time.time()
+            video_id = 0
+            out = self.write_video_file(video_id) # Save video clip
+
+            while self.cap.is_opened():
+                ret, frame = self.cap.read()
+                out.write(frame)
+                cv2.imshow('Webcam Feed', frame)
+
+                # If video length longer than interval set, save video
+                if time.time() - start_time > interval: 
+                    out.release()
+                    print(f"Run: {video_id}")
+
+                    # self.hume_api.set_file_path(f"./.mp4/output_{video_id}.mp4") # Set video clip path for Hume API
+                    # print(self.hume_api.get_file_path())
+
+                    video_id += 1
+                    start_time = time.time()
+
+                    out = self.write_video_file(video_id) # Save video clip
+
+                    # # Run Hume API in a separate thread
+                    # thread = threading.Thread(target=self.hume_api.handle_hume_call, args=[video_id])
+                    # thread.start()
+
+                # Press 'q' to quit
+                if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
-        def stop(self):
-            "Finishes the video recording therefore the thread too"
-            if self.open:
-                self.open=False
-                self.video_out.release()
-                self.video_cap.release()
-                cv2.destroyAllWindows()
+            self.release()
+
+#########################################################################################################
+                
+
+        def release(self):
+            "Ends video recording and thread"
+            self.cap.release()
+            cv2.destroyAllWindows()
 
         def start(self):
             "Launches the video recording function using a thread"
-            video_thread = threading.Thread(target=self.record)
+            video_thread = threading.Thread(target=self.record_video)
             video_thread.start()
+
+        def is_opened(self):
+            return self.cap.isOpened()
+
+        def write_video_file(self, video_id):
+            "Saves the video clip to a file"
+            return cv2.VideoWriter(f'./.mp4/output_{video_id}.mp4', self.fourcc, 60.0, (self.video_width, self.video_height)) 
+
+
+
+    
+
+    

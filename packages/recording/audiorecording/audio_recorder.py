@@ -12,13 +12,12 @@ import os
 
 class AudioRecorder():
         "Audio class based on pyAudio and Wave"
-        def __init__(self, filename="temp_audio.wav", rate=44100, fpb=1024, channels=2):
+        def __init__(self, rate=44100, fpb=1024, channels=2):
             self.open = True
             self.rate = rate
             self.frames_per_buffer = fpb
             self.channels = channels
             self.format = pyaudio.paInt16
-            self.audio_filename = filename
             self.audio = pyaudio.PyAudio()
             self.stream = self.audio.open(format=self.format,
                                         channels=self.channels,
@@ -51,10 +50,10 @@ class AudioRecorder():
             audio_thread.start()
         
         def write_audio_file(self, audio_file_id):
-            waveFile = wave.open(f'./.wav/audio_{audio_file_id}.wav', 'wb')
-            waveFile.setnchannels(self.channels)
-            waveFile.setsampwidth(self.audio.get_sample_size(self.format))
-            waveFile.setframerate(self.rate)
-            waveFile.writeframes(b''.join(self.audio_frames))
-            waveFile.close()
+            audio_file = wave.open(f'./.wav/audio_{audio_file_id}.wav', 'wb')
+            audio_file.setnchannels(self.channels)
+            audio_file.setsampwidth(self.audio.get_sample_size(self.format))
+            audio_file.setframerate(self.rate)
+            audio_file.writeframes(b''.join(self.audio_frames))
+            audio_file.close()
             

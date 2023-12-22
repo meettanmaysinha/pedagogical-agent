@@ -14,7 +14,7 @@ class Webcam:
         self.video_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.video_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    def start_video_writer(self, video_id):
+    def write_video_file(self, video_id):
         return cv2.VideoWriter(f'./.mp4/output_{video_id}.mp4', self.fourcc, 60.0, (self.video_width, self.video_height))
 
     def read(self):

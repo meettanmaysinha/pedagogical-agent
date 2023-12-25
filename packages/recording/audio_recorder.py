@@ -12,7 +12,7 @@ import os
 
 class AudioRecorder():
         "Audio class based on pyAudio and Wave"
-        def __init__(self, rate=44100, fpb=1024, channels=2):
+        def __init__(self, rate = 44100, fpb = 1024, channels = 2):
             self.open = True
             self.rate = rate
             self.frames_per_buffer = fpb
@@ -26,22 +26,25 @@ class AudioRecorder():
                                         frames_per_buffer = self.frames_per_buffer)
             self.audio_frames = []
 
-        def record(self):
+        def record(self, audio_file_name = "test"):
             "Audio starts being recorded"
-            self.stream.start_stream()
+            
             while self.open:
                 data = self.stream.read(self.frames_per_buffer) 
                 self.audio_frames.append(data)
                 if not self.open:
                     break
-
-        def stop(self):
+            self.stop(audio_file_name)
+####
+            
+        def stop(self, audio_file_name = "test"):
             "Finishes the audio recording therefore the thread too"
             if self.open:
                 self.open = False
                 self.stream.stop_stream()
                 self.stream.close()
                 self.audio.terminate()
+                self.write_audio_file(audio_file_name)
                 
 
         def start(self):
@@ -49,8 +52,8 @@ class AudioRecorder():
             audio_thread = threading.Thread(target=self.record)
             audio_thread.start()
         
-        def write_audio_file(self, audio_file_id):
-            audio_file = wave.open(f'./.wav/audio_{audio_file_id}.wav', 'wb')
+        def write_audio_file(self, audio_file_name = "test"):
+            audio_file = wave.open(f'../../audio/{audio_file_name}.wav', 'wb')
             audio_file.setnchannels(self.channels)
             audio_file.setsampwidth(self.audio.get_sample_size(self.format))
             audio_file.setframerate(self.rate)

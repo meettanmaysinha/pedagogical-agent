@@ -40,38 +40,19 @@ class VideoRecorder():
 
 #########################################################################################################
                 
-        def record_video(self, interval = 5):
+        def record_video(self, video_name = "test"):
             start_time = time.time()
             video_id = 0
-            out = self.write_video_file(video_id) # Save video clip
+            out = self.write_video_file(video_name) # Create video clip
 
             while self.cap.is_opened():
                 ret, frame = self.cap.read()
                 out.write(frame)
                 cv2.imshow('Webcam Feed', frame)
 
-                # If video length longer than interval set, save video
-                if time.time() - start_time > interval: 
-                    out.release()
-                    print(f"Run: {video_id}")
+            out.release() # Save video clip
+            self.release() # Close webcam
 
-                    # self.hume_api.set_file_path(f"./.mp4/output_{video_id}.mp4") # Set video clip path for Hume API
-                    # print(self.hume_api.get_file_path())
-
-                    video_id += 1
-                    start_time = time.time()
-
-                    out = self.write_video_file(video_id) # Save video clip
-
-                    # # Run Hume API in a separate thread
-                    # thread = threading.Thread(target=self.hume_api.handle_hume_call, args=[video_id])
-                    # thread.start()
-
-                # Press 'q' to quit
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-
-            self.release()
 
 #########################################################################################################
                 
@@ -89,9 +70,9 @@ class VideoRecorder():
         def is_opened(self):
             return self.cap.isOpened()
 
-        def write_video_file(self, video_id):
+        def write_video_file(self, video_name = "test"):
             "Saves the video clip to a file"
-            return cv2.VideoWriter(f'./.mp4/output_{video_id}.mp4', self.fourcc, 60.0, (self.video_width, self.video_height)) 
+            return cv2.VideoWriter(f'../../video/{video_name}.mp4', self.fourcc, 60.0, (self.video_width, self.video_height)) 
 
 
 

@@ -31,14 +31,31 @@ class AVRecorder():
         self.audio_thread.write_audio_file(filename)
 
     def start_AVrecording(self):
-        self.audio_thread.start()
+        print("Start AV Recording...")
         self.video_thread.start()
+        self.audio_thread.start()
 
     def save_AVrecording(self,filename="test"):
+        print("Trying to save AV....")
         self.save_audio_recording(filename)
         self.save_video_recording(filename)
+        av_file_path = "./output/av_output/"
+        # Merging audio and video signal
+        # if abs(recorded_fps - 6) >= 0.01:    # If the fps rate was higher/lower than expected, re-encode it to the expected
+        #     print("Re-encoding")
+        #     cmd = "ffmpeg -r " + str(recorded_fps) + " -i {temp_video}.avi -pix_fmt yuv420p -r 6 {temp_video2}.avi"
+        #     subprocess.call(cmd, shell=True)
+        #     print("Muxing")
+        #     cmd = "ffmpeg -y -ac 2 -channel_layout stereo -i {temp_audio}.wav -i {temp_video2}.avi -pix_fmt yuv420p " + filename + ".avi"
+        #     subprocess.call(cmd, shell=True)
+        # else:
+        print("Normal recording\nMuxing")
+        cmd = f"ffmpeg -y -ac 2 -channel_layout stereo -i {filename}.wav -i {filename}.avi -pix_fmt yuv420p {av_file_path + filename}.avi"
+        subprocess.call(cmd, shell=True)
+        print("..")
 
     def stop_AVrecording(self, filename="test"):
+        self.save_AVrecording(filename)
         self.audio_thread.stop(filename)
         self.video_thread.release()
 
@@ -47,20 +64,9 @@ class AVRecorder():
             time.sleep(1)
 
         self.open = False
-        # Merging audio and video signal
-        # if abs(recorded_fps - 6) >= 0.01:    # If the fps rate was higher/lower than expected, re-encode it to the expected
-        #     print("Re-encoding")
-        #     cmd = "ffmpeg -r " + str(recorded_fps) + " -i temp_video.avi -pix_fmt yuv420p -r 6 temp_video2.avi"
-        #     subprocess.call(cmd, shell=True)
-        #     print("Muxing")
-        #     cmd = "ffmpeg -y -ac 2 -channel_layout stereo -i temp_audio.wav -i temp_video2.avi -pix_fmt yuv420p " + filename + ".avi"
-        #     subprocess.call(cmd, shell=True)
-        # else:
-        print("Normal recording\nMuxing")
-        cmd = "ffmpeg -y -ac 2 -channel_layout stereo -i temp_audio.wav -i temp_video.avi -pix_fmt yuv420p " + "../../av_output/" + filename + ".avi"
-        subprocess.call(cmd, shell=True)
-        print("..")
-
+    
+    def read(self):
+        return self.video_thread.cap.read()
     # def file_manager(self, filename="test"):
     #     "Required and wanted processing of final files"
     #     local_path = os.getcwd()

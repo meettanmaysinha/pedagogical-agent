@@ -6,7 +6,7 @@
 
 import os
 import pandas as pd
-from emotions_dict import emotions_sequence_map
+from . import emotions_dict
 
 class PatternMine:
     def __init__(self, algorithm="PrefixSpan", minsup=0.7, minpat=10):
@@ -23,7 +23,7 @@ class PatternMine:
         # Write new content along with existing content
         with open('extracted_sequence.txt', 'w') as f:
             # Write the Emotions decoder to the file
-            f.write(emotions_sequence_map)
+            f.write(emotions_dict.emotions_sequence_map)
             # Write the existing content back to the file
             f.write(existing_content)
 

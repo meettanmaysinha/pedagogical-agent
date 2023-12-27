@@ -3,3 +3,5 @@ apikey.py
 *.mp4
 *.csv
 *.pyc
+*.wav
+*.avi

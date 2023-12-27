@@ -1,10 +1,13 @@
 # hume_api.py
 import asyncio
 from hume import HumeStreamClient
-from hume.models.config import FaceConfig
-from PatternMine import PatternMine
-from emotions_dict import emotions_dict
+from hume.models.config import FaceConfig, ProsodyConfig
+# from packages.emotionpattern.PatternMine import PatternMine
+from packages.emotionpattern.emotions_dict import emotions_dict
 import pandas as pd
+import websockets
+import ssl
+import certifi
 
 class HumeAPI:
     def __init__(self, api_key, file_path):
@@ -12,7 +15,7 @@ class HumeAPI:
         self.FILE_PATH = file_path
         self.extracted_results = pd.DataFrame()
         self.aggregated_results = pd.DataFrame()
-        self.pattern_mine = PatternMine()
+        # self.pattern_mine = PatternMine()
 
     def set_file_path(self, file_path):
         self.FILE_PATH = file_path
@@ -32,7 +35,7 @@ class HumeAPI:
         loop.run_until_complete(self.hume_call(video_id))
         loop.close()
 
-    async def hume_call(self,video_id=-1):
+    async def hume_call(self,video_name="test"):
         print("Hume Call Start")
         client = HumeStreamClient(self.API_KEY)
         config = FaceConfig(identify_faces=True)
@@ -54,8 +57,8 @@ class HumeAPI:
             self.print_results()
             
             # Attach video id to results to determine sequence of videos
-            self.extracted_results["video_id"] = video_id
-            self.aggregated_results["video_id"] = video_id
+            self.extracted_results["video_name"] = video_name
+            self.aggregated_results["video_name"] = video_name
 
             self.results_to_csv(self.extracted_results, "extracted_emotions.csv", mode="a")
             self.results_to_csv(self.aggregated_results, "aggregated_emotions.csv", mode="a")

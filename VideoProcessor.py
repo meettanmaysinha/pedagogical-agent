@@ -13,18 +13,18 @@ class VideoProcessor:
         self.webcam = AVRecorder() # Create instance of AVRecorder
         self.interval = interval
 
-    # def start_webcam(self):
-    #     self.webcam.start() # Start webcam
+    def start_webcam(self):
+        self.webcam.start_AVrecording() # Start webcam
 
     async def process_video(self):
-        self.webcam.start_AVrecording() # Start AV webcam recording
         start_time = time.time()
+        # self.webcam.start_AVrecording() # Start webcam
         av_id = 0
         av_name = f"output_{av_id}"
         # out = self.webcam.save_AVrecording(video_name) # Save video clip
 
         while self.webcam.open:
-            # ret, frame = self.webcam.read()
+            # ret, frame = self.webcam.video_thread.cap.read()
             # out.write(frame)
             # cv2.imshow('Webcam Feed', frame)
 

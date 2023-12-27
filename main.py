@@ -1,7 +1,6 @@
 # main.py
 import asyncio
 from VideoProcessor import VideoProcessor
-from packages.recording import AVRecorder 
 from packages.emotionpattern.PatternMine import PatternMine
 import apikey
 import time

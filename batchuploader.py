@@ -63,7 +63,11 @@ class EmotionsAnalyser:
         dataframe["third_emotion_score"] = dataframe.apply(lambda x: x["emotions"][2]["score"],axis=1)
         # return dataframe
 
-
+    def most_common_occurence(self, dataframe=None):
+        # Get most common emotion
+        most_common_emotion = dataframe['first_emotion'].value_counts().idxmax()
+        most_common_emotion_occurences = dataframe['first_emotion'].value_counts()[most_common_emotion]
+        return most_common_emotion, most_common_emotion_occurences
 # Example usage
 # FILE_PATH = ["/Users/chengyao/Downloads/Hume_Test_Video_Football.mp3"]
 FILE_PATH = ["/Users/chengyao/Downloads/Test_Video_Family_Guy.mp3"]
@@ -75,3 +79,5 @@ predictions = processor.process_file()
 analyser = EmotionsAnalyser()
 analyser.display_file_details(predictions)
 df = analyser.to_dataframe(predictions)
+
+print("The most common occurence of emotion is: ", (analyser.most_common_occurence(dataframe=df)))

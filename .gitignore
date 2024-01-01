@@ -1,4 +1,5 @@
 apikey.py
+predictions.json
 .DS_Store
 *.mp4
 *.csv

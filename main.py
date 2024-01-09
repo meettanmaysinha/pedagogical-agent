@@ -16,8 +16,8 @@ def main():
     video_processor.start_webcam()
     loop.run_until_complete(video_processor.process_video())
 
-    print("Running Sequence Mining Algorithm...")
     time.sleep(5) # Delay to allow async tasks to clear
+    print("Running Sequence Mining Algorithm...")
     pattern_mine.run("extracted_sequence.txt", "output_sequence.txt")
 
 if __name__ == "__main__":

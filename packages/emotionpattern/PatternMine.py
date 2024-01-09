@@ -5,6 +5,7 @@
 # https://www.philippe-fournier-viger.com/spmf/PrefixSpan.php
 
 import os
+import subprocess
 import pandas as pd
 from . import emotions_dict
 
@@ -28,7 +29,7 @@ class PatternMine:
             f.write(existing_content)
 
         # Run PrefixSpan algorithm from the command line, then writes to output file
-        os.system(f"java -jar spmf.jar run {self.algorithm} {input_filename} {output_filename} {self.minsup} {self.minpat}")
+        subprocess.call(f"java -jar spmf.jar run {self.algorithm} {input_filename} {output_filename} {self.minsup} {self.minpat}", shell=True)
 
 
     def print_results(self, file_name):

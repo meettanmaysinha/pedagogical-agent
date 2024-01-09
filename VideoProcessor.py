@@ -28,7 +28,7 @@ class VideoProcessor:
         print("Normal recording\nMuxing")
         # Create directory if it does not exist
         os.makedirs(av_file_path, exist_ok=True)
-        cmd = f"ffmpeg -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac {av_file_path + av_name}.mp4"
+        cmd = f"ffmpeg -y -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac {av_file_path + av_name}.mp4"
         print(cmd)
         subprocess.call(cmd, shell=True)
 

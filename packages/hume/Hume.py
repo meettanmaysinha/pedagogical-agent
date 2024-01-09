@@ -18,41 +18,48 @@ class HumeAPI:
         # self.pattern_mine = PatternMine()
 
     def set_file_path(self, file_path):
+        '''Sets file path of clip being analysed'''
         self.FILE_PATH = file_path
 
     def get_file_path(self):
+        '''Returns file path of clip being analysed'''
         return self.FILE_PATH
     
     def print_results(self):
+        '''Prints results of each Hume call'''
         print(self.aggregated_results.loc[:, ["most_common_emotion","highest_scored_emotion","emotion_score"]])
     
     def write_results(self):
+        '''Appends results of each Hume call to results CSV file'''
         self.extracted_results.to_csv("results.csv", mode='a')  
 
     def handle_hume_call(self, video_id=-1):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.hume_call(video_id))
+        '''Handles Hume API call'''
+        loop = asyncio.new_event_loop() # Create new event loop
+        asyncio.set_event_loop(loop) # Set event loop
+        loop.run_until_complete(self.hume_call(video_id)) # Run Hume API call
         loop.close()
 
     async def hume_call(self,video_name="test"):
+        '''Performs Hume API call asynchronously'''
         print("Hume Call Start")
-        client = HumeStreamClient(self.API_KEY)
-        config = FaceConfig(identify_faces=True)
+        client = HumeStreamClient(self.API_KEY) # Create Hume client
+        config = [FaceConfig(identify_faces=True), ProsodyConfig()] # Create Hume config
 
-        async with client.connect([config]) as socket:
+        async with client.connect(config) as socket:
             result = await socket.send_file(self.FILE_PATH)
 
         print(f"File Path = {self.FILE_PATH}")
 
         try:
+            # Extract results from Hume API call
             results = result["face"]["predictions"]
             self.extracted_results = pd.json_normalize(results)
 
             self.sort_results(self.extracted_results)
-            self.extract_emotions()
+            self.extract_emotions() # Get top 3 emotions
 
-            self.aggregate_emotions()
+            self.aggregate_emotions() # Get frequency of emotions
 
             self.print_results()
             
@@ -60,10 +67,10 @@ class HumeAPI:
             self.extracted_results["video_name"] = video_name
             self.aggregated_results["video_name"] = video_name
 
-            self.results_to_csv(self.extracted_results, "extracted_emotions.csv", mode="a")
-            self.results_to_csv(self.aggregated_results, "aggregated_emotions.csv", mode="a")
+            self.results_to_csv(self.extracted_results, "extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
+            self.results_to_csv(self.aggregated_results, "aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
 
-            self.extract_sequence(sequences=4)
+            self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
 
             return self.aggregated_results
             
@@ -75,11 +82,12 @@ class HumeAPI:
         return self.aggregated_results
 
     def results_to_csv(self, dataframe, file_path, mode='a'):
+        '''Writes results to CSV file'''
         # Check if the file already exists
         try:
             # Read the first row of the existing file
             with open(file_path, 'r') as file:
-                first_line = file.readline().strip()
+                file.readline().strip()
 
             # Determine whether to write headers based on the existing file
             headers_exist = pd.notna(pd.read_csv(file_path, nrows=0).columns).any()
@@ -93,12 +101,15 @@ class HumeAPI:
 
 
     def sort_results(self, results):
+        '''Sorts emotions by name in ascending order'''
         results.apply(lambda x: self.sort_emotions(x["emotions"]), axis=1)
 
     def sort_emotions(self, emotions):
+        '''Sorts emotions by scores in descending order'''
         emotions.sort(key=lambda x: x['score'], reverse=True)
 
     def extract_emotions(self):
+            '''Get top emotions'''
         # try:
             # Extract top 3 emotions
             self.extracted_results["top3_emotions"] = self.extracted_results.apply(lambda x: x["emotions"][:3],axis=1)
@@ -116,6 +127,7 @@ class HumeAPI:
         #     pass
 
     def aggregate_emotions(self):
+        '''Get highest scored and most frequent emotions'''
         try:
             # Highest scored emotion
             highest_scored_emotion = (

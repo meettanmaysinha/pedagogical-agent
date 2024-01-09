@@ -12,7 +12,7 @@ import os
 
 class AudioRecorder():
         "Audio class based on pyAudio and Wave"
-        def __init__(self, rate = 44100, fpb = 1024, device_index = 0):
+        def __init__(self, rate = 44100, fpb = 2048, device_index = 0):
             self.open = True
             self.rate = rate
             self.frames_per_buffer = fpb
@@ -37,7 +37,7 @@ class AudioRecorder():
             "Audio starts being recorded"
             print("AUDIO RECORDING", self.open)
             while self.open:
-                data = self.stream.read(self.frames_per_buffer) 
+                data = self.stream.read(self.frames_per_buffer, exception_on_overflow=False) 
                 self.audio_frames.append(data)
                 if not self.open:
                     break
@@ -46,13 +46,11 @@ class AudioRecorder():
             
         def stop(self, audio_file_name = "test"):
             "Finishes the audio recording therefore the thread too"
-            if self.open:
-                self.open = False
-                self.stream.stop_stream()
-                self.stream.close()
-                self.audio.terminate()
-                self.write_audio_file(audio_file_name)
-                
+            self.open = False
+            self.stream.stop_stream()
+            self.stream.close()
+            self.audio.terminate()
+            self.write_audio_file(audio_file_name)
 
         def start(self):
             "Launches the audio recording function using a thread"
@@ -73,4 +71,8 @@ class AudioRecorder():
             audio_file.setframerate(self.rate)
             audio_file.writeframes(b''.join(self.audio_frames))
             audio_file.close()
+
+            #Reset audio frames for new clip
+            self.audio_frames = []
+            print("Audio saved" + audio_file_name)
             

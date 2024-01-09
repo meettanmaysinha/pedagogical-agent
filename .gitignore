@@ -1,5 +1,6 @@
 apikey.py
 predictions.json
+extracted_sequence.txt
 .DS_Store
 *.mp4
 *.csv

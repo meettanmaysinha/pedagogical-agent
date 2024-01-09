@@ -6,15 +6,18 @@ import threading
 import asyncio
 from packages.hume.Hume import HumeAPI
 from packages.recording.AVRecorder import AVRecorder
+from packages.recording.Webcam import Webcam
 
 class VideoProcessor:
     def __init__(self, api_key, file_path="../output_0", interval=5):
         self.hume_api = HumeAPI(api_key, file_path) # Create instane of HumeAPI
-        self.webcam = AVRecorder() # Create instance of AVRecorder
+        # self.webcam = AVRecorder() # Create instance of AVRecorder
+        self.webcam = Webcam() # Create instance of Webcam
         self.interval = interval
 
     def start_webcam(self):
-        self.webcam.start_AVrecording() # Start webcam
+        # self.webcam.start_AVrecording() # Start webcam
+        self.webcam.start()
 
     async def process_video(self):
         start_time = time.time()
@@ -22,11 +25,12 @@ class VideoProcessor:
         av_id = 0
         av_name = f"output_{av_id}"
         # out = self.webcam.save_AVrecording(video_name) # Save video clip
+        out = self.webcam.write_video_file(av_name)
 
-        while self.webcam.open:
-            # ret, frame = self.webcam.video_thread.cap.read()
-            # out.write(frame)
-            # cv2.imshow('Webcam Feed', frame)
+        while self.webcam.is_opened:
+            ret, frame = self.webcam.read()
+            out.write(frame)
+            cv2.imshow('Webcam Feed', frame)
 
             # If video length longer than interval set, save video
             if time.time() - start_time > self.interval: 
@@ -38,7 +42,7 @@ class VideoProcessor:
                 print(self.hume_api.get_file_path())
 
                 # Save AV clip 
-                self.webcam.save_AVrecording(av_name)
+                # self.webcam.save_AVrecording(av_name)
                 
                 # Set new av ID and name for next clip
                 av_id += 1
@@ -55,5 +59,6 @@ class VideoProcessor:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        self.webcam.stop_AVrecording()
+        # self.webcam.stop_AVrecording()
+        self.webcam.release()
         cv2.destroyAllWindows()

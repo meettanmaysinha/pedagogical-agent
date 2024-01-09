@@ -1,59 +1,89 @@
 # video_processor.py
 
+import os
 import cv2
 import time
 import threading
 import asyncio
+import subprocess
 from packages.hume.Hume import HumeAPI
 from packages.recording.AVRecorder import AVRecorder
+from packages.recording.Webcam import Webcam
+from packages.recording.audio_recorder import AudioRecorder
 
 class VideoProcessor:
     def __init__(self, api_key, file_path="../output_0", interval=5):
         self.hume_api = HumeAPI(api_key, file_path) # Create instane of HumeAPI
-        self.webcam = AVRecorder() # Create instance of AVRecorder
+        # self.webcam = AVRecorder() # Create instance of AVRecorder
+        self.webcam = Webcam() # Create instance of Webcam
+        self.audio = AudioRecorder() # Create instance of AudioRecorder
         self.interval = interval
 
-    # def start_webcam(self):
-    #     self.webcam.start() # Start webcam
+    def start_webcam(self):
+        # self.webcam.start_AVrecording() # Start webcam
+        self.webcam.start()
+        self.audio.start()
+
+    def combine_av(self, av_name, av_file_path = "./output/av_output/", audio_file_path = "./output/audio/", video_file_path = "./output/video/"):
+        print("Normal recording\nMuxing")
+        # Create directory if it does not exist
+        os.makedirs(av_file_path, exist_ok=True)
+        cmd = f"ffmpeg -y -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac {av_file_path + av_name}.mp4"
+        print(cmd)
+        subprocess.call(cmd, shell=True)
 
     async def process_video(self):
-        self.webcam.start_AVrecording() # Start AV webcam recording
         start_time = time.time()
-        av_id = 0
-        av_name = f"output_{av_id}"
+        # self.webcam.start_AVrecording() # Start webcam
+        self.webcam.start()
+        output_id = 0
+        output_name = f"output_{output_id}"
         # out = self.webcam.save_AVrecording(video_name) # Save video clip
+        out = self.webcam.write_video_file(output_name)
+        self.audio.write_audio_file(output_name) # Save audio clip
+        buffer = 2 # Number of clips to buffer before running Hume API
 
-        while self.webcam.open:
-            # ret, frame = self.webcam.read()
-            # out.write(frame)
-            # cv2.imshow('Webcam Feed', frame)
-
+        while self.webcam.is_opened:
+            ret, frame = self.webcam.read()
+            out.write(frame)
+            cv2.imshow('Webcam Feed', frame)
             # If video length longer than interval set, save video
             if time.time() - start_time > self.interval: 
                 # out.release()
-                print(f"Run: {av_name}")
+                print(f"Run: {output_name}")
 
-                # Set AV clip path for Hume API
-                self.hume_api.set_file_path(f"./.mp4/{av_name}.mp4") 
-                print(self.hume_api.get_file_path())
-
-                # Save AV clip 
-                self.webcam.save_AVrecording(av_name)
-                
-                # Set new av ID and name for next clip
-                av_id += 1
-                av_name = f"output_{av_id}"
+                # Set new AV ID and name for next clip
+                output_id += 1
+                output_name = f"output_{output_id}"
                 start_time = time.time()
 
-                # out = self.webcam.write_video_file(video_name) # Save video clip
+                out = self.webcam.write_video_file(output_name) # Save video clip
+                self.audio.write_audio_file(output_name) # Save audio clip
 
-                # Run Hume API in a separate thread
-                thread = threading.Thread(target=self.hume_api.handle_hume_call, args=[av_id])
-                thread.start()
+                # Combine AV and start Hume after a number of recordings to allow buffer time for processing
+                if output_id > buffer:
+                    av_id = output_id - buffer
+                    av_name = f"output_{av_id}"
+                    av_file_path = "./output/av_output/"
+
+                    # Save AV clip
+                    print(f"New AV: {av_name}")
+                    # self.webcam.save_AVrecording(av_name)
+                    self.combine_av(av_name=av_name, av_file_path=av_file_path)
+
+                    # Set AV clip path for Hume API
+                    self.hume_api.set_file_path(f"{av_file_path + av_name}.mp4")
+                    print(self.hume_api.get_file_path())
+
+                    # Run Hume API in a separate thread
+                    thread = threading.Thread(target=self.hume_api.handle_hume_call, args=[av_id])
+                    thread.start()
 
             # Press 'q' to quit
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        self.webcam.stop_AVrecording()
+        # self.webcam.stop_AVrecording()
+        self.webcam.release()
         cv2.destroyAllWindows()
+        self.audio.stop()

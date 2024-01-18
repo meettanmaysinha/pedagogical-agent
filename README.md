@@ -7,26 +7,54 @@
 
 1. Install Python packages
    ```sh
-   pip install requirements.txt
+   $ pip install -r requirements.txt
    ```
 2. Create a file called `api_key.py` *(Already Created)*
    ```py
    const API_KEY = 'ENTER YOUR API';
    ```
 
+<!-- Scripts -->
+## Main Scripts
+
+### Webcam Stream
+
+   ```sh
+   python streammain.py
+   ```
+   Webcam will turn on and recordings will be saved in the `./output` folder
+   * Video recording will be saved in `./output/video` 
+   * Audio recording will be saved in `./output/audio`
+   * Combined recording will be saved in `./output/av_output`
+
+
+
+### Batch Upload
+   ```sh
+   streamlit run batchmain.py
+   ```
+
+   Open the Streamlit link on browser to access the interface
+   * Upload an audio/video file (WAV, MP3, M4A, MP4, AVI, MPEG4)
+   * After processing, the predcitions and analysis will be displayed as a dataframe available for download in CSV format
+
+
 <!-- FILES -->
 ## Files
 
-#### Main Classes
+#### Main Folders and Classes
     .
-    ├── main.py					# Main file to run
-    ├── VideoProcessor.py		# Activates webcam and handles Hume API calls
-    ├── VideoAudioRecorder.py	# Currently unused - For audio recording
-    ├── Webcam.py				# Handles webcam input 
-    ├── Hume.py					# Hume API calls
-    ├── PatternMine.py			# Sequential Pattern Mining
-    └── spmf.jar				# Algorithms for Pattern Mining
-    
+    ├── output             # Webcam Recordings
+        └── audio          # Audio Recordings
+        └── video          # Video Recordings
+        └── av_output      # Combined AV Recordings (Hume AI input)
+    ├── packages           # Packages and modules required for software
+    ├── apikey.py          # API Key for Hume AI
+    ├── batchmain.py       # Main script for batch uploader
+    ├── batchuploader.py   # Main script for batch uploader
+    ├── requirements.txt   # List of packages or libraries to be installed
+    ├── VideoProcessor.py  # Handles Hume API calls
+    └── spmf.jar           # Algorithms for Pattern Mining
 
 #### Text/CSV Files
     .
@@ -34,13 +62,15 @@
     ├── aggregated_emotions.csv			# Aggregated and cleaned results
     ├── extracted_sequence.txt			# Input sequence of emotions for Sequence Mining
     ├── output_sequence.txt				# Output results of Sequence Mining
-    └── emotions_dict.py				# Dictionary mapping emotions with Emotion ID (for sequence mining)
+    └── emotions_dict.py				# Dictionary mapping emotions with Emotion ID (for pattern mining)
 
 
 <!-- USAGE -->
 ## Usage
 
 1. Configure processing interval in `main.py`, changing the interval parameter
+
+   (Currently facing bugs, interval can only be max 5 seconds for now)
    ```py
    video_processor  =  VideoProcessor(API_KEY, interval=5)
    ```
@@ -63,8 +93,8 @@
 <!-- OUTPUT -->
 ## Output
 
-### Videos
-Video clips will be saved in the `/.mp4`  folder according to the interval set in `main.py`
+### Recordings
+AV Recordings will be saved in the `/output/av_output`  folder according to the interval set in `main.py`
 
 Each clip is sent through an API call to Hume, returning predictions for emotion
 

@@ -17,8 +17,6 @@ st.title("Emotions Video Analyser")
 # File upload
 uploaded_file = st.file_uploader("Choose a file...", type=["wav","mp3","m4a","mp4","avi"])
 
-
-
 # Check if a file has been uploaded
 if uploaded_file is not None:
 

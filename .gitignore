@@ -1,4 +1,4 @@
-apikey.py
+# apikey.py # API Key for Hume AI
 predictions.json
 extracted_sequence.txt
 output_sequence.txt

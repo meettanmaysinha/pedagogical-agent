@@ -63,7 +63,7 @@ class AudioRecorder():
             audio_directory = './output/audio/'
             os.makedirs(audio_directory, exist_ok=True)
             
-            print("Audio saving in progress...", audio_directory)
+            # print("Audio saving in progress...", audio_directory)
             # Save audio file
             audio_file = wave.open(audio_directory + f'{audio_file_name}.wav', 'w')
             audio_file.setnchannels(self.max_input_channels)
@@ -74,5 +74,5 @@ class AudioRecorder():
 
             #Reset audio frames for new clip
             self.audio_frames = []
-            print("Audio saved" + audio_file_name)
+            # print("Audio saved" + audio_file_name)
             

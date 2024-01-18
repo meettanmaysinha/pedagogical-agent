@@ -25,11 +25,11 @@ class VideoProcessor:
         self.audio.start()
 
     def combine_av(self, av_name, av_file_path = "./output/av_output/", audio_file_path = "./output/audio/", video_file_path = "./output/video/"):
-        print("Normal recording\nMuxing")
+        # print("Normal recording\nMuxing")
         # Create directory if it does not exist
         os.makedirs(av_file_path, exist_ok=True)
-        cmd = f"ffmpeg -y -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac {av_file_path + av_name}.mp4"
-        print(cmd)
+        cmd = f"ffmpeg -hide_banner -loglevel error -y -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac {av_file_path + av_name}.mp4"
+        # print(cmd)
         subprocess.call(cmd, shell=True)
 
     async def process_video(self):
@@ -47,10 +47,11 @@ class VideoProcessor:
             ret, frame = self.webcam.read()
             out.write(frame)
             cv2.imshow('Webcam Feed', frame)
-            # If video length longer than interval set, save video
-            if time.time() - start_time > self.interval: 
+            # Hume Max Video Length is 5s
+            # If video length longer than 5s, save video
+            if time.time() - start_time > 5: 
                 # out.release()
-                print(f"Run: {output_name}")
+                print(f"Recording: {output_name}")
 
                 # Set new AV ID and name for next clip
                 output_id += 1
@@ -67,13 +68,13 @@ class VideoProcessor:
                     av_file_path = "./output/av_output/"
 
                     # Save AV clip
-                    print(f"New AV: {av_name}")
+                    # print(f"New AV: {av_name}")
                     # self.webcam.save_AVrecording(av_name)
                     self.combine_av(av_name=av_name, av_file_path=av_file_path)
 
                     # Set AV clip path for Hume API
                     self.hume_api.set_file_path(f"{av_file_path + av_name}.mp4")
-                    print(self.hume_api.get_file_path())
+                    # print(self.hume_api.get_file_path())
 
                     # Run Hume API in a separate thread
                     thread = threading.Thread(target=self.hume_api.handle_hume_call, args=[av_id])

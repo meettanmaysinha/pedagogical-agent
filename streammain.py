@@ -4,11 +4,12 @@ from VideoProcessor import VideoProcessor
 from packages.emotionpattern.PatternMine import PatternMine
 import apikey
 import time
+import batchuploader
 
 API_KEY = apikey.API_KEY
 
 def main():
-    video_processor = VideoProcessor(API_KEY, interval=5) # Intervals can be updated for short/long term analysis
+    video_processor = VideoProcessor(API_KEY, interval=10) # Intervals can be updated for short/long term analysis
     pattern_mine = PatternMine("PrefixSpan",0.5,5) 
     
     

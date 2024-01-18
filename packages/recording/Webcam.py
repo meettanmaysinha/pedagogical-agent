@@ -22,7 +22,7 @@ class Webcam:
         video_directory = "./output/video/"
         os.makedirs(video_directory, exist_ok=True)
         # return cv2.VideoWriter(video_directory + f'output_{video_id}.mp4', self.fourcc, 60.0, (self.video_width, self.video_height)) 
-        print("Video saved" + video_name)
+        # print("Video saved" + video_name)
         return cv2.VideoWriter(f'{video_directory + video_name}.mp4', self.fourcc, self.fps, (self.video_width, self.video_height))
 
     def read(self):

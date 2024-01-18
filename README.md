@@ -83,7 +83,7 @@
 
 3. Allow access to Camera and the video feed should start
 4. While the video feed is running, emotions predictions will be printed in the terminal and also saved into `extracted_emotions.csv` and `aggregated_emotions.csv`
-5. Video feed will be saved at every fixed interval *(default 5 sec)* into the `/.mp4` folder
+5. Recordings will be saved at every fixed interval *(default 5 sec)* into the `/output/av_output` folder
 6. Sequences will be extracted into `extracted_sequence.txt` and encoded using Emotion IDs in `emotions_dict.py` 
 7. To close the video feed, press 'Q' on your keyboard
 8. Sequence mining algorithm will then run and output will be printed in `output_sequence.txt`

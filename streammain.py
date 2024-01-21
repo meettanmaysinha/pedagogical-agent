@@ -19,7 +19,7 @@ def main():
 
     time.sleep(5) # Delay to allow async tasks to clear
     print("Running Sequence Mining Algorithm...")
-    pattern_mine.run("extracted_sequence.txt", "output_sequence.txt")
+    pattern_mine.run("./results/extracted_sequence.txt", "./results/output_sequence.txt")
 
 if __name__ == "__main__":
     main()

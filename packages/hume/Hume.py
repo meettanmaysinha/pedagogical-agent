@@ -5,9 +5,7 @@ from hume.models.config import FaceConfig, ProsodyConfig
 # from packages.emotionpattern.PatternMine import PatternMine
 from packages.emotionpattern.emotions_dict import emotions_dict
 import pandas as pd
-import websockets
-import ssl
-import certifi
+import os
 
 class HumeAPI:
     def __init__(self, api_key, file_path):
@@ -31,7 +29,7 @@ class HumeAPI:
     
     def write_results(self):
         '''Appends results of each Hume call to results CSV file'''
-        self.extracted_results.to_csv("results.csv", mode='a')  
+        self.extracted_results.to_csv("./results/results.csv", mode='a')  
 
     def handle_hume_call(self, video_id=-1):
         '''Handles Hume API call'''
@@ -66,9 +64,13 @@ class HumeAPI:
             # Attach video id to results to determine sequence of videos
             self.extracted_results["video_name"] = video_name
             self.aggregated_results["video_name"] = video_name
-
-            self.results_to_csv(self.extracted_results, "extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
-            self.results_to_csv(self.aggregated_results, "aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
+            
+            # Create directory if it does not exist
+            results_directory = './results'
+            os.makedirs(results_directory, exist_ok=True)
+            
+            self.results_to_csv(self.extracted_results, "./results/extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
+            self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
 
@@ -160,7 +162,7 @@ class HumeAPI:
     # sequences determine how many past sequences of emotions to consider
     def extract_sequence(self, sequences):
         try:
-                collated_results = pd.read_csv("aggregated_emotions.csv")
+                collated_results = pd.read_csv("./results/aggregated_emotions.csv")
                 # Initialise column sequence
                 collated_results["emotion_sequence"] = ""
                 if len(collated_results) >= sequences:
@@ -171,7 +173,7 @@ class HumeAPI:
                                 j[index] = self.map_emotions(k) # Map emotions to an emotion ID for PatternMine
 
 
-                    self.export_sequence(collated_results,"extracted_sequence.txt")
+                    self.export_sequence(collated_results,"./results/extracted_sequence.txt")
                 else:
                     print("Not enough rows to get sequence")
         except Exception as e:

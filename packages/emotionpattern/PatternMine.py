@@ -18,11 +18,11 @@ class PatternMine:
 
     def run(self, input_filename, output_filename):
         # Read existing content
-        with open('extracted_sequence.txt', 'r') as f:
+        with open('./results/extracted_sequence.txt', 'r') as f:
             existing_content = f.read()
 
         # Write new content along with existing content
-        with open('extracted_sequence.txt', 'w') as f:
+        with open('./results/extracted_sequence.txt', 'w') as f:
             # Write the Emotions decoder to the file
             f.write(emotions_dict.emotions_sequence_map)
             # Write the existing content back to the file

@@ -11,6 +11,7 @@ API_KEY = apikey.API_KEY
 def main():
     video_processor = VideoProcessor(API_KEY, interval=5, recording_folder="recordings") # Intervals can be updated for short/long term analysis
     pattern_mine = PatternMine("PrefixSpan",0.5,5) 
+    # pattern_mine = PatternMine("Two-Phase",0.5,5)
     
     
     loop = asyncio.get_event_loop()

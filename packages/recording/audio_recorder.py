@@ -12,7 +12,7 @@ import os
 
 class AudioRecorder():
         "Audio class based on pyAudio and Wave"
-        def __init__(self, rate = 44100, fpb = 2048, device_index = 0):
+        def __init__(self, rate = 44100, fpb = 2048, device_index = 0, recording_folder = "recordings"):
             self.open = True
             self.rate = rate
             self.frames_per_buffer = fpb
@@ -21,6 +21,7 @@ class AudioRecorder():
             self.device_index = device_index
             # self.max_input_channels = self.get_max_input_channels() # Get max input channels
             self.max_input_channels = 1 # Mono recording
+            self.recording_folder = recording_folder
             self.stream = self.audio.open(format=self.format,
                                         channels=self.max_input_channels,
                                         rate=self.rate,
@@ -60,7 +61,7 @@ class AudioRecorder():
         def write_audio_file(self, audio_file_name = "test"):
             # Create directory if it does not exist
             
-            audio_directory = './output/audio/'
+            audio_directory = f'./{self.recording_folder}/audio/'
             os.makedirs(audio_directory, exist_ok=True)
             
             # print("Audio saving in progress...", audio_directory)

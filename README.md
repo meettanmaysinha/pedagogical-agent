@@ -22,10 +22,10 @@
    ```sh
    python streammain.py
    ```
-   Webcam will turn on and recordings will be saved in the `./output` folder
-   * Video recording will be saved in `./output/video` 
-   * Audio recording will be saved in `./output/audio`
-   * Combined recording will be saved in `./output/av_output`
+   Webcam will turn on and recordings will be saved in the `./recordings` folder
+   * Video recording will be saved in `./recordings/video` 
+   * Audio recording will be saved in `./recordings/audio`
+   * Combined recording will be saved in `./recordings/av_output`
 
 
 
@@ -44,7 +44,7 @@
 
 #### Main Folders and Classes
     .
-    ├── output             # Webcam Recordings
+    ├── recordings         # Webcam Recordings
         └── audio          # Audio Recordings
         └── video          # Video Recordings
         └── av_output      # Combined AV Recordings (Hume AI input)
@@ -90,11 +90,10 @@
 
 
 
-<!-- OUTPUT -->
-## Output
+<!-- Recordings -->
+## Recordings
 
-### Recordings
-AV Recordings will be saved in the `/output/av_output`  folder according to the interval set in `main.py`
+AV Recordings will be saved in the `/recordings/av_output`  folder according to the interval set in `main.py`
 
 Each clip is sent through an API call to Hume, returning predictions for emotion
 

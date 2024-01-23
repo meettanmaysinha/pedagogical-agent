@@ -9,9 +9,22 @@ import os
 import json
 
 class HumeAPI:
-    def __init__(self, api_key, file_path):
+    def __init__(self, api_key, file_path, confidence_allowance=0.05):
+        """Creates instance of HumeAI API to get emotions predictions
+        Parameters
+        ----------
+        api_key: str
+            API Key for HumeAI
+        
+        file_path: str
+            File path of recording for HumeAI prediction
+        
+        confidence_allowance : float
+            Confidence score allowance for emotions to be co-occuring (default = 0.05)
+        """
         self.API_KEY = api_key
         self.FILE_PATH = file_path
+        self.confidence_allowance = confidence_allowance
         self.extracted_results = pd.DataFrame()
         self.aggregated_results = pd.DataFrame()
         # self.pattern_mine = PatternMine()
@@ -42,16 +55,20 @@ class HumeAPI:
     async def hume_call(self,video_name="test"):
         '''Performs Hume API call asynchronously'''
         print("Hume Call Start")
+        # Create directory if it does not exist
+        results_directory = './results'
+        os.makedirs(results_directory, exist_ok=True)
+        
         client = HumeStreamClient(self.API_KEY) # Create Hume client
         config = [FaceConfig(identify_faces=True), ProsodyConfig()] # Create Hume config
 
         # async with client.connect(config) as socket:
         #     result = await socket.send_file(self.FILE_PATH)
-        #     with open('./results/predictions.json', 'w', encoding='utf-8') as f:
+        #     with open(f'./{results_directory}/predictions.json', 'w', encoding='utf-8') as f:
         #         json.dump(result, f, ensure_ascii=False, indent=4)
 
         # Opening JSON file
-        f = open('predictions.json')
+        f = open(f'./{results_directory}/predictions.json')
         # returns JSON object as 
         # a dictionary
         result = json.load(f)
@@ -71,10 +88,6 @@ class HumeAPI:
             # Attach video id to results to determine sequence of videos
             self.extracted_results["video_name"] = video_name
             self.aggregated_results["video_name"] = video_name
-            
-            # Create directory if it does not exist
-            results_directory = './results'
-            os.makedirs(results_directory, exist_ok=True)
             
             self.results_to_csv(self.extracted_results, "./results/extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
@@ -161,16 +174,16 @@ class HumeAPI:
             print(f"An error occurred: {e}")
 
     def aggregate_emotions(self):
-        '''Get highest scored and most frequent emotions'''
+        '''Get highest scored and most frequent emotions for each processed interval'''
         try:
-            # Highest scored emotion
+            # Highest scored emotion in the interval
             highest_scored_emotion = (
                 self.extracted_results.loc[self.extracted_results
                 .groupby(["face_id"])["emotion1_score"]
                 .idxmax(), ["face_id", "emotion1", "emotion1_score"]]
             )
 
-            # Most common emotion
+            # Most common emotion in the interval
             most_common_emotion = (
                 self.extracted_results.groupby(["face_id", "emotion1"])
                 .size().reset_index(name="count")
@@ -180,20 +193,42 @@ class HumeAPI:
                 .reset_index()
             )
 
-            # Average predictions of emotions
+            # Average prediction scores of emotions for the interval
             averaged_emotions = self.extracted_results.groupby("face_id").apply(self.average_predictions).reset_index()
-            # print(averaged_emotions)
+            averaged_emotions.rename(columns={averaged_emotions.columns[1]:"averaged_emotions"}, inplace=True) # Rename
+            print("Avg Emotion type = ", type(averaged_emotions))
+            
+            # Extract dominant emotions by score including co-occuring emotions
+            averaged_emotions["dominant_emotions"] = averaged_emotions.apply(lambda x: self.get_occuring_emotions(x["averaged_emotions"]), axis=1)
 
-            highest_scored_emotion = highest_scored_emotion.rename(columns={"emotion1": "highest_scored_emotion", "emotion1_score": "emotion_score"})
-            most_common_emotion = most_common_emotion.rename(columns={"emotion1": "most_common_highest_scored_emotion", "count": "emotion_count"})
-
-            # Join the two results together
+            # Renaming columns
+            highest_scored_emotion.rename(columns={"emotion1": "highest_scored_emotion", "emotion1_score": "emotion_score"}, inplace=True)
+            most_common_emotion.rename(columns={"emotion1": "most_common_highest_scored_emotion", "count": "emotion_count"}, inplace=True)
+            
+            # Join the results together
             self.aggregated_results = highest_scored_emotion.merge(most_common_emotion, on="face_id", how="left")
             self.aggregated_results = self.aggregated_results.merge(averaged_emotions, on="face_id", how="left")
 
-        except:
+        except Exception as e:
+            print("Error aggregating emotions, ",e)
             pass # No faces detected
 
+    def get_occuring_emotions(self, avg_emotions_dict, confidence_allowance=0.05):
+        top_emotion_score = float(max(avg_emotions_dict.values()))
+        def filter_occuring_emotions(emotion_score_pair):            
+            emotion, score = emotion_score_pair
+            if score < top_emotion_score - confidence_allowance:
+                return False # Filter out non-occurring emotions
+            else:
+                return True # Keep co-occuring emotions
+        print("goe 3", avg_emotions_dict)
+        occuring_emotions = dict(filter(filter_occuring_emotions, avg_emotions_dict.items()))
+        print("goe 4")
+        print(filter(filter_occuring_emotions, avg_emotions_dict.items()))
+        print("goe 5")
+        print(occuring_emotions)
+        return occuring_emotions
+                
     # For Sequential Pattern Mining (ie. PrefixSpan)
     # Currently inefficient, rewrites the entire column per iteration
     # "sequences" argument determines how many past sequences(rows) of emotions to consider

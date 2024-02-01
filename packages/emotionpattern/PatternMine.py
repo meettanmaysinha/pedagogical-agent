@@ -10,13 +10,10 @@ import pandas as pd
 from . import emotions_dict
 
 class PatternMine:
-    def __init__(self, algorithm="PrefixSpan", minsup=0.7, minpat=10):
+    def __init__(self, algorithm="PrefixSpan"):
         self.algorithm = algorithm
-        self.minsup = minsup
-        self.minpat = minpat    
 
-
-    def run(self, input_filename, output_filename):
+    def run(self, input_filename, output_filename, *args):
         # Read existing content
         with open(input_filename) as f:
             existing_content = f.read()
@@ -29,7 +26,7 @@ class PatternMine:
             f.write(existing_content)
 
         # Run Mining algorithm from the command line, then writes to output file
-        subprocess.call(f"java -jar spmf.jar run {self.algorithm} {input_filename} {output_filename} {self.minsup} {self.minpat}", shell=True)
+        subprocess.call(f"java -jar spmf.jar run {self.algorithm} {input_filename} {output_filename} {' '.join(map(str,args))}", shell=True)
 
     def print_results(self, file_name):
         # Read the output file line by line
@@ -39,6 +36,6 @@ class PatternMine:
         outFile.close()
 
 
-# pattern = PatternMine("PrefixSpan", 0.7, 5)
-# pattern.run("contextPrefixSpan.txt", "output.txt")
+# pattern = PatternMine("PrefixSpan")
+# pattern.run("contextPrefixSpan.txt", "output.txt", 0.7, 5)
 

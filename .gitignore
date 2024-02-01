@@ -10,3 +10,5 @@ output_sequence.txt
 *.pyc
 *.wav
 *.avi
+results/extracted_utility.txt
+results/output_utility.txt

@@ -63,10 +63,10 @@ class HumeAPI:
         client = HumeStreamClient(self.API_KEY) # Create Hume client
         config = [FaceConfig(identify_faces=True), ProsodyConfig()] # Create Hume config
 
-        # async with client.connect(config) as socket:
-        #     result = await socket.send_file(self.FILE_PATH)
-        #     with open(f'./{results_directory}/predictions.json', 'w', encoding='utf-8') as f:
-        #         json.dump(result, f, ensure_ascii=False, indent=4)
+        async with client.connect(config) as socket:
+            result = await socket.send_file(self.FILE_PATH)
+            with open(f'./{results_directory}/predictions.json', 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=4)
 
         # Opening JSON file
         f = open(f'./{results_directory}/predictions.json')
@@ -244,7 +244,7 @@ class HumeAPI:
 
                     self.export_sequence(collated_results,"./results/extracted_sequence.txt")
                 else:
-                    print("Not enough rows to get sequence")
+                    print("Not enough rows to get sequence") # Let Hume run a few more times to gather enough data for seq pattern mining
         except Exception as e:
             print(e," Error extracting sequence")
             pass
@@ -264,7 +264,6 @@ class HumeAPI:
             return encoded_emotions
         
         try:    
-                print("Heh")
                 # Load aggregated emotions
                 collated_results = pd.read_csv("./results/aggregated_emotions.csv")
                 collated_results["dominant_emotions"] = collated_results["dominant_emotions"].apply(lambda x: ast.literal_eval(x))
@@ -280,11 +279,8 @@ class HumeAPI:
                 collated_results["occurring_emotions_scores_total"] = collated_results["occurring_emotions_scores_total"].astype(int)
 
                 # Encode emotions to emotion ID
-                print(collated_results[["occurring_emotions","occurring_emotions_scores","occurring_emotions_scores_total"]])
                 collated_results["occurring_emotions_encoded"] = collated_results["occurring_emotions"].apply(lambda x: encode_emotions_tuple(x))
-                print("Hehhh")
-                # collated_results["occurring_emotions_scores_encoded"] = collated_results["occurring_emotions_scores"].apply(lambda x: encode_emotions_tuple(x))
-                print("Hehhh2")
+
                 collated_results.to_csv("./results/encoded_emotions.csv")
                 # Export utility to file
                 self.export_utility(collated_results,"./results/extracted_utility.txt")
@@ -314,11 +310,9 @@ class HumeAPI:
         '''
         Exports dominant emotions into fixed format for High Utility 
         '''
-        print("Heh2")
+        # Join scores into a single string
         results["occurring_emotions_scores"] = results["occurring_emotions_scores"].apply(lambda x: " ".join(map(str,x)))
-        print(results["occurring_emotions_scores"])
-        print(type(results["occurring_emotions_scores"]))
-        print(results.columns)
+        # Join Emotions, Total Confidence Scores and Individual Confidence Scores into a single string for Pattern mining
         results["utility_encoded"] = results.apply(lambda x:"".join([
             # Encoded Emotions
             str(x["occurring_emotions_encoded"]).replace("[","").replace("]","").replace(",","").replace("'",""),
@@ -329,23 +323,5 @@ class HumeAPI:
             # Individual scores 
             str(x["occurring_emotions_scores"]).replace("[","").replace("]","").replace(",","").replace("'",""),
         ]), axis = 1)
-        '''
-            # Encoded Emotions
-            results["occurring_emotions_encoded"].apply(lambda x: str(x)
-                                              .replace("[","") 
-                                              .replace("]","") 
-                                              .replace(",","") 
-                                              .replace("'","")),
-            ":", # Separator
-            # Total confidence scores
-            results["occurring_emotions_scores_total"].astype(str),
-            ":", # Separator
-            # Individual scores 
-            results["occurring_emotions_scores"].apply(lambda x: str(x)
-                                              .replace("[","") 
-                                              .replace("]","") 
-                                              .replace(",","") 
-                                              .replace("'","")),
-            '''
-        
+
         results["utility_encoded"].to_csv(filepath, index=False, header=False)

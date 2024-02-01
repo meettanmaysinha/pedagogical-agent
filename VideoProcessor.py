@@ -29,8 +29,8 @@ class VideoProcessor:
         # print("Normal recording\nMuxing")
         # Create directory if it does not exist
         os.makedirs(av_file_path, exist_ok=True)
-        cmd = f"ffmpeg -hide_banner -loglevel error -y -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac {av_file_path + av_name}.mp4"
-        # print(cmd)
+        # Combine audio and video recording (Limit to 5s - Anything longer will be cut off)
+        cmd = f"ffmpeg -hide_banner -loglevel error -y -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac -t 5 {av_file_path + av_name}.mp4"
         subprocess.call(cmd, shell=True)
 
     async def process_video(self):

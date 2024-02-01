@@ -50,7 +50,7 @@ class AVRecorder():
         #     subprocess.call(cmd, shell=True)
         # else:
         print("Normal recording\nMuxing")
-        cmd = f"ffmpeg -y -ac 2 -channel_layout stereo -i {filename}.wav -i {filename}.avi -pix_fmt yuv420p {av_file_path + filename}.avi"
+        cmd = f"ffmpeg -y -ac 2 -channel_layout stereo -i {filename}.wav -i {filename}.avi -pix_fmt yuv420p -t 1 {av_file_path + filename}.avi"
         subprocess.call(cmd, shell=True)
         print("..")
 

@@ -12,19 +12,20 @@ from packages.recording.Webcam import Webcam
 from packages.recording.audio_recorder import AudioRecorder
 
 class VideoProcessor:
-    def __init__(self, api_key, file_path="../output_0", interval=5):
+    def __init__(self, api_key, file_path="../output_0", interval=5, recording_folder="recordings"):
         self.hume_api = HumeAPI(api_key, file_path) # Create instane of HumeAPI
         # self.webcam = AVRecorder() # Create instance of AVRecorder
         self.webcam = Webcam() # Create instance of Webcam
         self.audio = AudioRecorder() # Create instance of AudioRecorder
         self.interval = interval
+        self.recording_folder = recording_folder
 
     def start_webcam(self):
         # self.webcam.start_AVrecording() # Start webcam
         self.webcam.start()
         self.audio.start()
 
-    def combine_av(self, av_name, av_file_path = "./output/av_output/", audio_file_path = "./output/audio/", video_file_path = "./output/video/"):
+    def combine_av(self, av_name,av_file_path = "./recordings/av_output/", audio_file_path = "./recordings/audio/", video_file_path = "./recordings/video/"):
         # print("Normal recording\nMuxing")
         # Create directory if it does not exist
         os.makedirs(av_file_path, exist_ok=True)
@@ -65,7 +66,7 @@ class VideoProcessor:
                 if output_id > buffer:
                     av_id = output_id - buffer
                     av_name = f"output_{av_id}"
-                    av_file_path = "./output/av_output/"
+                    av_file_path = f"./{self.recording_folder}/av_output/"
 
                     # Save AV clip
                     # print(f"New AV: {av_name}")

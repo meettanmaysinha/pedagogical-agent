@@ -22,10 +22,10 @@
    ```sh
    python streammain.py
    ```
-   Webcam will turn on and recordings will be saved in the `./output` folder
-   * Video recording will be saved in `./output/video` 
-   * Audio recording will be saved in `./output/audio`
-   * Combined recording will be saved in `./output/av_output`
+   Webcam will turn on and recordings will be saved in the `./recordings` folder
+   * Video recording will be saved in `./recordings/video` 
+   * Audio recording will be saved in `./recordings/audio`
+   * Combined recording will be saved in `./recordings/av_output`
 
 
 
@@ -44,26 +44,23 @@
 
 #### Main Folders and Classes
     .
-    ├── output             # Webcam Recordings
+    ├── recordings         # Webcam Recordings
         └── audio          # Audio Recordings
         └── video          # Video Recordings
         └── av_output      # Combined AV Recordings (Hume AI input)
     ├── packages           # Packages and modules required for software
+    ├── results           # Predictions and Pattern Mining Results
+        └── extracted_emotions.csv       # Predictions of Hume AI
+        └── aggregated_emotions.csv      # Aggregated and cleaned results
+        └── extracted_sequence.txt       # Input sequence of emotions for Sequence Mining
+        └── output_sequence.txt          # Output results of Sequence Mining
     ├── apikey.py          # API Key for Hume AI
     ├── batchmain.py       # Main script for batch uploader
     ├── batchuploader.py   # Main script for batch uploader
     ├── requirements.txt   # List of packages or libraries to be installed
     ├── VideoProcessor.py  # Handles Hume API calls
     └── spmf.jar           # Algorithms for Pattern Mining
-
-#### Text/CSV Files
-    .
-    ├── extracted_emotions.csv			# Predictions of Hume AI
-    ├── aggregated_emotions.csv			# Aggregated and cleaned results
-    ├── extracted_sequence.txt			# Input sequence of emotions for Sequence Mining
-    ├── output_sequence.txt				# Output results of Sequence Mining
-    └── emotions_dict.py				# Dictionary mapping emotions with Emotion ID (for pattern mining)
-
+    
 
 <!-- USAGE -->
 ## Usage
@@ -83,18 +80,17 @@
 
 3. Allow access to Camera and the video feed should start
 4. While the video feed is running, emotions predictions will be printed in the terminal and also saved into `extracted_emotions.csv` and `aggregated_emotions.csv`
-5. Recordings will be saved at every fixed interval *(default 5 sec)* into the `/output/av_output` folder
+5. Recordings will be saved at every fixed interval *(default 5 sec)* into the `/recordings/av_output` folder
 6. Sequences will be extracted into `extracted_sequence.txt` and encoded using Emotion IDs in `emotions_dict.py` 
 7. To close the video feed, press 'Q' on your keyboard
 8. Sequence mining algorithm will then run and output will be printed in `output_sequence.txt`
 
 
 
-<!-- OUTPUT -->
-## Output
+<!-- Recordings -->
+## Recordings
 
-### Recordings
-AV Recordings will be saved in the `/output/av_output`  folder according to the interval set in `main.py`
+AV Recordings will be saved in the `/recordings/av_output`  folder according to the interval set in `main.py`
 
 Each clip is sent through an API call to Hume, returning predictions for emotion
 

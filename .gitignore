@@ -1,10 +1,14 @@
 # apikey.py # API Key for Hume AI
+__pycache__
 predictions.json
 extracted_sequence.txt
 output_sequence.txt
+.conda
 .DS_Store
 *.mp4
 *.csv
 *.pyc
 *.wav
 *.avi
+results/extracted_utility.txt
+results/output_utility.txt

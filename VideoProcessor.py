@@ -12,8 +12,8 @@ from packages.recording.Webcam import Webcam
 from packages.recording.audio_recorder import AudioRecorder
 
 class VideoProcessor:
-    def __init__(self, api_key, file_path="../output_0", interval=5, recording_folder="recordings"):
-        self.hume_api = HumeAPI(api_key, file_path) # Create instane of HumeAPI
+    def __init__(self, api_key, file_path="../output_0", interval=5, recording_folder="recordings", confidence_allowance = 0.05):
+        self.hume_api = HumeAPI(api_key, file_path, confidence_allowance) # Create instane of HumeAPI
         # self.webcam = AVRecorder() # Create instance of AVRecorder
         self.webcam = Webcam() # Create instance of Webcam
         self.audio = AudioRecorder() # Create instance of AudioRecorder

@@ -12,3 +12,5 @@ output_sequence.txt
 *.avi
 results/extracted_utility.txt
 results/output_utility.txt
+results/output_frequent_itemsets.txt
+results/extracted_frequent_itemsets.txt

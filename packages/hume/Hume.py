@@ -94,7 +94,8 @@ class HumeAPI:
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
-            self.extract_utility() # Get utility for emotions occurences
+            self.extract_utility() # Get utility for emotions 
+            self.extract_frequent_itemsets() # Get frequent itemsets for frequent itemset mining
 
             return self.aggregated_results
             
@@ -122,7 +123,6 @@ class HumeAPI:
         except:
             # If the file doesn't exist, write the DataFrame with headers
             dataframe.to_csv(file_path, header=True, index=False)
-
 
     def sort_results(self, results):
         '''Sorts emotions by name in ascending order'''
@@ -210,6 +210,12 @@ class HumeAPI:
             self.aggregated_results = highest_scored_emotion.merge(most_common_emotion, on="face_id", how="left")
             self.aggregated_results = self.aggregated_results.merge(averaged_emotions, on="face_id", how="left")
 
+            # For each row in the dataframe, get occurring emotions and confidence score
+            # self.aggregated_results["dominant_emotions"] = self.aggregated_results["dominant_emotions"].apply(lambda x: ast.literal_eval(x)) # Convert string to dictionary
+            self.aggregated_results["occurring_emotions"] = self.aggregated_results["dominant_emotions"].apply(lambda x: list(x.keys()))
+            self.aggregated_results["occurring_emotions_scores"] = self.aggregated_results["dominant_emotions"].apply(lambda x: list(x.values()))
+            self.aggregated_results["occurring_emotions_encoded"] = self.aggregated_results["occurring_emotions"].apply(lambda x: self.encode_emotions_list(x))
+
         except Exception as e:
             print("Error aggregating emotions, ",e)
             pass # No faces detected
@@ -225,7 +231,16 @@ class HumeAPI:
         occurring_emotions = dict(filter(filter_occurring_emotions, avg_emotions_dict.items()))
         print(filter(filter_occurring_emotions, avg_emotions_dict.items()))
         return occurring_emotions
-                
+
+    def encode_emotions_list(self, emotions_list):
+        '''
+        Encodes emotions to emotion ID
+        '''
+        encoded_emotions = []
+        for emotion in emotions_list:
+            encoded_emotions.append(self.map_emotions(emotion))
+        return encoded_emotions
+     
     # For Sequential Pattern Mining (ie. PrefixSpan)
     # Currently inefficient, rewrites the entire column per iteration
     # "sequences" argument determines how many past sequences(rows) of emotions to consider
@@ -254,39 +269,47 @@ class HumeAPI:
         '''
         Extracts confidence from emotions predictions as utility
         '''
-        def encode_emotions_tuple(emotions_tuple):
-            '''
-            Encodes emotions to emotion ID
-            '''
-            encoded_emotions = []
-            for emotion in emotions_tuple:
-                encoded_emotions.append(self.map_emotions(emotion))
-            return encoded_emotions
         
         try:    
                 # Load aggregated emotions
                 collated_results = pd.read_csv("./results/aggregated_emotions.csv")
-                collated_results["dominant_emotions"] = collated_results["dominant_emotions"].apply(lambda x: ast.literal_eval(x))
+                
+                collated_results["occurring_emotions"] = collated_results["occurring_emotions"].apply(lambda x: ast.literal_eval(x)) # Convert from string representation 
+                collated_results["occurring_emotions_scores"] = collated_results["occurring_emotions_scores"].apply(lambda x: ast.literal_eval(x)) # Convert from string representation 
+                collated_results["occurring_emotions_encoded"] = collated_results["occurring_emotions_encoded"].apply(lambda x: ast.literal_eval(x)) # Convert from string representation 
 
                 # For each row in the dataframe, get occurring emotions and confidence score
-                collated_results["occurring_emotions"] = collated_results["dominant_emotions"].apply(lambda x: x.keys())
-                collated_results["occurring_emotions_scores"] = collated_results["dominant_emotions"].apply(lambda x: list(x.values()))
                 collated_results["occurring_emotions_scores_total"] = collated_results["occurring_emotions_scores"].apply(lambda x: sum(x))
 
                 # Multiply scale by 100 and round to integer for High Utility Pattern Mining input
-                collated_results["occurring_emotions_scores"] = collated_results["occurring_emotions_scores"].apply(lambda x: [round(i * 100) for i in x])
+                collated_results["occurring_emotions_scores"] = collated_results["occurring_emotions_scores"].apply(lambda x: [round(i * 100) for i in x]) # Error here
                 collated_results["occurring_emotions_scores_total"] = collated_results["occurring_emotions_scores_total"]*100
                 collated_results["occurring_emotions_scores_total"] = collated_results["occurring_emotions_scores_total"].astype(int)
-
-                # Encode emotions to emotion ID
-                collated_results["occurring_emotions_encoded"] = collated_results["occurring_emotions"].apply(lambda x: encode_emotions_tuple(x))
-
-                collated_results.to_csv("./results/encoded_emotions.csv")
+        
                 # Export utility to file
                 self.export_utility(collated_results,"./results/extracted_utility.txt")
 
         except Exception as e:
             print(e," Error extracting utility")
+            pass
+    
+    # For Frequent Item Set Mining
+    def extract_frequent_itemsets(self):
+        '''
+        Extracts predicted emotions into sets for Frequent Item Set Mining
+        '''
+        try:
+            # Load aggregated emotions
+            collated_results = pd.read_csv("./results/aggregated_emotions.csv")
+
+            # Encode emotions to emotion ID
+            collated_results["occurring_emotions_encoded"] = collated_results["occurring_emotions_encoded"].apply(lambda x: ast.literal_eval(x)) # Convert from string representation 
+
+            # Export utility to file
+            self.export_frequent_itemsets(collated_results,"./results/extracted_frequent_itemsets.txt")
+
+        except Exception as e:
+            print(e," Error extracting Frequent Item Sets")
             pass
     
     def map_emotions(self, emotion):
@@ -325,3 +348,17 @@ class HumeAPI:
         ]), axis = 1)
 
         results["utility_encoded"].to_csv(filepath, index=False, header=False)
+
+    def export_frequent_itemsets(self, results, filepath):
+        '''
+        Exports dominant emotions into fixed format for Frequent Itemset Mining
+        '''
+        # Join Encoded Itemsets into string and remove brackets
+        results["itemsets_encoded"] = results.apply(lambda x:"".join([
+            # Encoded Emotions
+            str(x["occurring_emotions_encoded"]).replace("[","").replace("]","").replace(",","").replace("'","")
+        ]), axis = 1)
+
+            
+        results["itemsets_encoded"].to_csv(filepath, index=False, header=False)
+

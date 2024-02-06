@@ -60,7 +60,6 @@ class AudioRecorder():
         
         def write_audio_file(self, audio_file_name = "test"):
             # Create directory if it does not exist
-            
             audio_directory = f'./{self.recording_folder}/audio/'
             os.makedirs(audio_directory, exist_ok=True)
             
@@ -75,5 +74,5 @@ class AudioRecorder():
 
             #Reset audio frames for new clip
             self.audio_frames = []
-            # print("Audio saved" + audio_file_name)
+            print("Audio saved" + audio_file_name)
             

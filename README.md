@@ -195,4 +195,5 @@ Update SSL certificate with certifi (MacOS only)
 
 - [Hume AI Documentation](https://dev.hume.ai/docs/introduction)
 - [SPMF Algorithms](https://www.philippe-fournier-viger.com/spmf/index.php?link=algorithms.php)
-
+- [OpenAI Quickstart](https://platform.openai.com/docs/quickstart?context=python)
+- [OpenAI Streaming](https://platform.openai.com/docs/api-reference/introduction?lang=python)

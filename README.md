@@ -1,6 +1,6 @@
 <!-- GETTING STARTED -->
 ## Getting Started
-### Prerequisite
+### Prerequisites
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)   						![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 
 ### Installation
@@ -9,7 +9,17 @@
    ```sh
    $ pip install -r requirements.txt
    ```
-2. Create a file called `api_key.py` *(Already Created)*
+
+2. Install FFmpeg on your device
+
+   #### MacOS (Homebrew required):
+   ```sh
+   brew install ffmpeg
+   ```
+
+   #### For Windows, follow [these](https://phoenixnap.com/kb/ffmpeg-windows) instructions
+
+3. Create a file called `api_key.py` *(Already Created)*
    ```py
    const API_KEY = 'ENTER YOUR API';
    ```
@@ -149,8 +159,41 @@ Boredom | Boredom | Boredom | Boredom | #SUP: 27
 `|` represents the divider between item sets
 `#SUP` indicates the support of the pattern in the dataset
 
+# Decisions Made
+
+### Hume 
+- #### When combining Audio and Video, FFmpeg cuts off AV recording at 5s mark
+   - Combined Video and Audio recording is limited to 5s recording to fit into Hume’s limit
+   - Audio & Video recordings are separately recorded and saved at 5 seconds intervals
+
+
+### Video Recording
+- #### Audio file is saved before incrementing naming id then saving Video file 
+   - To save Audio file:
+      - We use `self.audio.write_audio_file(output_name)`
+      - A file of name `output_name` will be saved
+   - To save Video file:
+      - We use `out = self.webcam.write_video_file(output_name)`
+      - This saves a video with file name from the previous `output_name` assigned when video was saved
+      - A new video file of file name equal to the new `output_name` will be created for recording the future frames
+   - So if we used the same `output_name` for saving both audio and video there would be issues syncing the files, so to overcome this issue:
+      - We first save audio file
+      - Increment the `output_id`
+      - Then save the video file
+      - If not, video file id will lag behind audio file id by 1
+
+# Error Troubleshooting
+### SSLCertVerificationError
+Update SSL certificate with certifi (MacOS only)
+- Press "Command ⌘ + Space" button to open Spotlight
+- type `Install Certificates.command`
+
+[Credits](https://support.chainstack.com/hc/en-us/articles/9117198436249-Common-SSL-Issues-on-Python-and-How-to-Fix-it#:~:text=5.%20Update%20SSL%20certificate%20with%20certifi%20(MacOS%20only))
 
 
 # Resources
 
-[SPMF PrefixSpan Documentation](https://www.philippe-fournier-viger.com/spmf/PrefixSpan.php)
+- [Hume AI Documentation](https://dev.hume.ai/docs/introduction)
+- [SPMF Algorithms](https://www.philippe-fournier-viger.com/spmf/index.php?link=algorithms.php)
+- [OpenAI Quickstart](https://platform.openai.com/docs/quickstart?context=python)
+- [OpenAI Streaming](https://platform.openai.com/docs/api-reference/introduction?lang=python)

@@ -5,8 +5,11 @@ from packages.emotionpattern.PatternMine import PatternMine
 import apikey
 import time
 import batchuploader
+from dotenv import load_dotenv
+import os
 
-API_KEY = apikey.API_KEY
+load_dotenv()
+API_KEY = os.getenv("HUME_API_KEY")
 
 def main():
     # Video Streaming Processor

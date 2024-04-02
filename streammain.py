@@ -2,9 +2,8 @@
 import asyncio
 from VideoProcessor import VideoProcessor
 from packages.emotionpattern.PatternMine import PatternMine
-import apikey
 import time
-import batchuploader
+# import batchuploader
 from dotenv import load_dotenv
 import os
 

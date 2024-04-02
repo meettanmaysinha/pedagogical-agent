@@ -5,6 +5,7 @@ import cv2
 import time
 import threading
 import asyncio
+import json
 import subprocess
 from packages.hume.Hume import HumeAPI
 from packages.recording.Webcam import Webcam
@@ -27,6 +28,25 @@ class VideoProcessor:
         # print("Normal recording\nMuxing")
         # Create directory if it does not exist
         os.makedirs(av_file_path, exist_ok=True)
+        
+        # Map each AV output to a timestamp in a json file av_timestamps.json
+        av_timestamps_file = "av_timestamps.json"
+        with open(av_file_path+av_timestamps_file, "a+") as json_av:
+            try:
+                # JSON file is not empty
+                json_av.seek(0)  # move file pointer to the beginning
+                av_timestamps = json.load(json_av)
+            except Exception as e:
+                # JSON file is empty
+                av_timestamps = {} # Creates empty dict
+                print(e)
+        
+        unix_time = time.time() # Save timestamp of video to track
+        av_timestamps[av_name] = str(unix_time)
+
+        with open(av_file_path+av_timestamps_file, 'w') as json_av:
+            json.dump(av_timestamps, json_av)
+        
         # Combine audio and video recording (Limit to 5s - Anything longer will be cut off)
         cmd = f"ffmpeg -hide_banner -loglevel error -y -i {video_file_path + av_name}.mp4 -i {audio_file_path + av_name}.wav -c:v copy -c:a aac -t 5 {av_file_path + av_name}.mp4"
         subprocess.call(cmd, shell=True)

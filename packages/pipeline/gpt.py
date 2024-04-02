@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -20,12 +21,11 @@ openai = OpenAI(
 
 # Function to start Flask for the Agent API endpoint
 def run_agent_api():
-    
     subprocess.Popen("python packages/pipeline/gpt.py", shell=True)
-    print("Starting Flask...")
 
 # Initialise Flask
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Define the API endpoint for the chat response
 @app.route('/api/chat', methods=['POST'])
@@ -53,17 +53,18 @@ def api_get_chat_response():
 
     If any required parameters are missing, it returns a JSON response with an error message.
     """
-    data = request.json  # Assuming the data is sent in JSON format
-    cells_content = data.get('cells_content')
-    emotions = get_emotions()
-    print(cells_content)
-    print(emotions)
-    if cells_content is None or emotions is None:
-        return jsonify({"error": "Missing required parameters"}), 400
+    if request.method == 'POST':
+        data = request.json  # Assuming the data is sent in JSON format
+        cells_content = data.get('cells_content')
+        emotions = get_emotions()
+        print(cells_content)
+        print(emotions)
+        if cells_content is None or emotions is None:
+            return jsonify({"error": "Missing required parameters"}), 400
 
-    response = get_chat_response(cells_content, emotions)
-    
-    return jsonify({"response": response})
+        response = get_chat_response(cells_content, emotions)
+
+        return jsonify({"response": response}), 200
 
 def get_chat_response(cells_content, emotions):
     completion = openai.chat.completions.create(

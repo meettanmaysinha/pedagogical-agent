@@ -3,7 +3,6 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import pandas as pd
-import subprocess
 
 # import nltk
 # nltk.download('punkt')  # Download the punkt tokenizer models if not already downloaded
@@ -18,13 +17,7 @@ openai = OpenAI(
     api_key = os.getenv('OPENAI_API_KEY')
 )
 
-# Function to start Flask for the Agent API endpoint
-def run_agent_api():
-    
-    subprocess.Popen("python packages/pipeline/gpt.py", shell=True)
-    print("Starting Flask...")
-
-# Initialise Flask
+# Run Flask for the Agent API endpoint
 app = Flask(__name__)
 
 # Define the API endpoint for the chat response
@@ -56,8 +49,7 @@ def api_get_chat_response():
     data = request.json  # Assuming the data is sent in JSON format
     cells_content = data.get('cells_content')
     emotions = get_emotions()
-    print(cells_content)
-    print(emotions)
+    
     if cells_content is None or emotions is None:
         return jsonify({"error": "Missing required parameters"}), 400
 
@@ -73,7 +65,7 @@ def get_chat_response(cells_content, emotions):
             {"role":"user","content": "I am a student who is facing issues with my code." \
             f"Here is my extracted cell content from Jupyter Notebook: {cells_content}."\
             "For each error/output in output, the code snippet is in source. " \
-            f"My emotion is: {emotions}. Help me understand my problems better." \
+            f"I am feeling {emotions}. Help me understand my problems better." \
             "Give me the error code snippet in source by quoting it." \
             "Do not explicitly mention the dataset given to you, but you may mention its values."}
         ],
@@ -83,15 +75,9 @@ def get_chat_response(cells_content, emotions):
     return completion.choices[0].message.content
 
 def get_emotions():
-    aggregated_emotions = pd.read_csv("./results/aggregated_emotions.csv")
-    student_emotions = aggregated_emotions[["occurring_emotions", "datetime"]]
-    return student_emotions.iloc[-1, 0]
+    aggregated_emotions = pd.read_csv("./results/aggregated_emotions.csv", "r")
+    student_emotions = aggregated_emotions[["occuring_emotions", "datetime"]]
+    return student_emotions.iloc[:,-1]
 
 if __name__ == '__main__':
-    port = 8000 # Default port set to 8000
-    try:
-        app.run(port=port, debug=True)
-    except OSError as e:
-        print("Port is already in use, please kill the process and try again.")
-        print("You can kill the process using the following command in the terminal:")
-        print("npx kill-port 8000")
+    app.run(debug=True)

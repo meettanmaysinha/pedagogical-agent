@@ -100,7 +100,7 @@ class HumeAPI:
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
-            self.extract_utility() # Get utility for emotions 
+            self.extract_utility() # Get utility for emotions
             self.extract_frequent_itemsets() # Get frequent itemsets for frequent itemset mining
 
             return self.aggregated_results

@@ -4,7 +4,11 @@ import pandas as pd
 from hume import HumeBatchClient
 from hume.models.config import FaceConfig
 from hume.models.config import ProsodyConfig
-from apikey import API_KEY
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+API_KEY = os.getenv("HUME_API_KEY")
 
 class FileProcessor:
     def __init__(self, configs=[FaceConfig(),ProsodyConfig()], file_path=None):

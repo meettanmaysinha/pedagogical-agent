@@ -16,3 +16,4 @@ results/output_frequent_itemsets.txt
 results/extracted_frequent_itemsets.txt
 packages/DUMP/video_recorder.py
 packages/DUMP/AVRecorder.py
+recordings/av_output/av_timestamps.json

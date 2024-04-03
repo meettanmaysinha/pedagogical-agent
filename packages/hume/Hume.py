@@ -68,11 +68,13 @@ class HumeAPI:
             with open(f'./{results_directory}/predictions.json', 'w', encoding='utf-8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=4)
 
-        # Opening JSON file
-        f = open(f'./{results_directory}/predictions.json')
-        # returns JSON object as 
-        # a dictionary
+        # Opening JSON file for predictions
+        f = open(f'./{results_directory}/predictions.json') # returns prediction results as a dictionary
         result = json.load(f)
+
+        # Opening JSON file for AV_ouput timestamps
+        av_timestamps_json = open(f'./recordings/av_output/av_timestamps.json')
+        av_timestamps = json.load(av_timestamps_json)
 
         try:
             # Extract results from Hume API call
@@ -87,14 +89,18 @@ class HumeAPI:
             self.print_results()
             
             # Attach video id to results to determine sequence of videos
-            self.extracted_results["video_name"] = video_name
-            self.aggregated_results["video_name"] = video_name
+            self.extracted_results["video_id"] = video_name
+            self.aggregated_results["video_id"] = video_name
+
+            # # Attach datetime to results to determine timestamp of videos
+            self.extracted_results["datetime"] = av_timestamps["output_" + str(video_name)]
+            self.aggregated_results["datetime"] = av_timestamps["output_" + str(video_name)]
             
             self.results_to_csv(self.extracted_results, "./results/extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
-            self.extract_utility() # Get utility for emotions 
+            self.extract_utility() # Get utility for emotions
             self.extract_frequent_itemsets() # Get frequent itemsets for frequent itemset mining
 
             return self.aggregated_results

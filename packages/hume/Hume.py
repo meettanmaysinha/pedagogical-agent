@@ -123,7 +123,6 @@ class HumeAPI:
             self.results_to_csv(self.extracted_results_vburst, "./results/extracted_vburst.csv", mode="a")
 
             # Append aggregated results
-            print(self.aggregated_results)
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a")
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
@@ -133,8 +132,7 @@ class HumeAPI:
             return self.aggregated_results
             
         except Exception as e:
-            print(e)
-            print("Error Detecting Emotions, trying again...")
+            print("Error Detecting Emotions, trying again... ", e)
             self.aggregated_results = pd.DataFrame()
 
         return self.aggregated_results

@@ -4,7 +4,6 @@ from VideoProcessor import VideoProcessor
 from packages.pipeline.gpt import run_agent_api
 from packages.emotionpattern.PatternMine import PatternMine
 import time
-# import batchuploader
 from dotenv import load_dotenv
 import os
 

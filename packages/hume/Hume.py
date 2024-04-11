@@ -108,11 +108,7 @@ class HumeAPI:
 
         # Clean and aggregate results
         try:
-            # Sort emotions from Highest to Lowest Score
-            self.sort_emotions(self.extracted_results_face)
-            self.sort_emotions(self.extracted_results_prosody)
-            self.sort_emotions(self.extracted_results_vburst)
-            self.extract_emotions() # Get top 3 emotions
+            self.extract_emotions() # Store emotion predictions to CSV
             self.aggregate_emotions() # Get frequency of emotions
             # Attach video id to results to determine sequence of videos
             self.extracted_results["video_name"] = video_name
@@ -157,6 +153,10 @@ class HumeAPI:
 
     def sort_emotions(self, emotions):
         '''Sorts emotions by scores in descending order'''
+        print(emotions)
+        # No Predictions
+        if len(emotions) == 0:
+            return None
         emotions.sort(key=lambda x: x['score'], reverse=True)
 
     def extract_emotions(self):
@@ -164,21 +164,15 @@ class HumeAPI:
         Collate emotions predictions from all model configs into a CSV
         '''
         try:
-            # Extract top 3 emotions
-            self.extracted_results["top3_emotions"] = self.extracted_results.apply(lambda x: x["emotions"][:3],axis=1)
-            # Extract most dominant emotion
-            self.extracted_results["emotion1"] = self.extracted_results.apply(lambda x: x["emotions"][0]["name"],axis=1)
-            self.extracted_results["emotion1_score"] = self.extracted_results.apply(lambda x: x["emotions"][0]["score"],axis=1)
-            # Extract second most dominant emotion
-            self.extracted_results["emotion2"] = self.extracted_results.apply(lambda x: x["emotions"][1]["name"],axis=1)
-            self.extracted_results["emotion2_score"] = self.extracted_results.apply(lambda x: x["emotions"][1]["score"],axis=1)
-            # Extract third most dominant emotion
-            self.extracted_results["emotion3"] = self.extracted_results.apply(lambda x: x["emotions"][2]["name"],axis=1)
-            self.extracted_results["emotion3_score"] = self.extracted_results.apply(lambda x: x["emotions"][2]["score"],axis=1)
+            extracted = {
+                "face_predictions":str(self.extracted_results_face),
+                "prosody_predictions":str(self.extracted_results_prosody),
+                "vburst_predictions":str(self.extracted_results_vburst)
+            }
+            self.extracted_results = pd.DataFrame(extracted, index=[0])
 
-        except:
-            print("No predictions available")
-            pass
+        except KeyError as e:
+            print("No predictions available: ", e)
 
     def average_predictions(self, emotions_list):
         '''Get average predictions of emotions for each group (face_id)'''
@@ -208,7 +202,7 @@ class HumeAPI:
             print(f"No values to aggregate: {e}")
 
     def aggregate_emotions(self):
-        '''Get highest scored and most frequent emotions for each processed interval'''
+        '''Get average emotion scores for each processed interval across all configs'''
         # Face Config
         try:
             # Average prediction scores of emotions for the interval (Face)

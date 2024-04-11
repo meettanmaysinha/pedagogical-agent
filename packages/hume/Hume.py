@@ -27,12 +27,12 @@ class HumeAPI:
         self.FILE_PATH = file_path
         self.confidence_allowance = confidence_allowance
         
-        # Dataframes to store individual config results
-        self.extracted_results_face = pd.DataFrame()
-        self.extracted_results_prosody = pd.DataFrame()
-        self.extracted_results_vburst = pd.DataFrame()
+        # # Dataframes to store individual config results
+        self.extracted_results = pd.DataFrame()
+        self.extracted_results_face = {}
+        self.extracted_results_prosody = {}
+        self.extracted_results_vburst = {}
         # Dataframe with compiled results
-        self.extracted_results_x = pd.DataFrame()
         self.aggregated_results = pd.DataFrame()
         # self.pattern_mine = PatternMine()
 
@@ -85,36 +85,39 @@ class HumeAPI:
         try:
             # Extract results from Hume API call
             face_results = result["face"]["predictions"]
-            self.extracted_results_face = pd.json_normalize(face_results)
+            self.extracted_results_face = face_results
         except KeyError:
             print("No Faces Detected...")
-            self.extracted_results_face = pd.DataFrame()
+            self.extracted_results_face = {}
 
         # Extract Prosody predictions
         try: 
             prosody_results = result["prosody"]["predictions"]
-            self.extracted_results_prosody = pd.json_normalize(prosody_results)
+            self.extracted_results_prosody = prosody_results
         except KeyError:
             print("No Speech Prosody Detected...")
-            self.extracted_results_prosody = pd.DataFrame()
+            self.extracted_results_prosody = {}
         
         # Extract Vocal Burst predictions
         try:
             vburst_results = result["vocal_burst"]["predictions"]
-            self.extracted_results_vburst = pd.json_normalize(vburst_results)
+            self.extracted_results_vburst = vburst_results
         except KeyError:
             print("No Vocal Bursts Detected...")
-            self.extracted_results_vburst = pd.DataFrame()
+            self.extracted_results_vburst = {}
 
         # Clean and aggregate results
         try:
-            self.sort_results(self.extracted_results_face)
-            # self.extract_emotions() # Get top 3 emotions
+            # Sort emotions from Highest to Lowest Score
+            self.sort_emotions(self.extracted_results_face)
+            self.sort_emotions(self.extracted_results_prosody)
+            self.sort_emotions(self.extracted_results_vburst)
+            self.extract_emotions() # Get top 3 emotions
             self.aggregate_emotions() # Get frequency of emotions
             # Attach video id to results to determine sequence of videos
-            self.extracted_results_x["video_name"] = video_name
+            self.extracted_results["video_name"] = video_name
             self.aggregated_results["video_name"] = video_name
-            self.results_to_csv(self.extracted_results_x, "./results/extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
+            self.results_to_csv(self.extracted_results, "./results/extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
@@ -156,24 +159,26 @@ class HumeAPI:
         '''Sorts emotions by scores in descending order'''
         emotions.sort(key=lambda x: x['score'], reverse=True)
 
-    # def extract_emotions(self):
-    #         '''Get top emotions'''
-    #     # try:
-    #         # Extract top 3 emotions
-    #         self.extracted_results["top3_emotions"] = self.extracted_results.apply(lambda x: x["emotions"][:3],axis=1)
-    #         # Extract most dominant emotion
-    #         self.extracted_results["emotion1"] = self.extracted_results.apply(lambda x: x["emotions"][0]["name"],axis=1)
-    #         self.extracted_results["emotion1_score"] = self.extracted_results.apply(lambda x: x["emotions"][0]["score"],axis=1)
-    #         # Extract second most dominant emotion
-    #         self.extracted_results["emotion2"] = self.extracted_results.apply(lambda x: x["emotions"][1]["name"],axis=1)
-    #         self.extracted_results["emotion2_score"] = self.extracted_results.apply(lambda x: x["emotions"][1]["score"],axis=1)
-    #         # Extract third most dominant emotion
-    #         self.extracted_results["emotion3"] = self.extracted_results.apply(lambda x: x["emotions"][2]["name"],axis=1)
-    #         self.extracted_results["emotion3_score"] = self.extracted_results.apply(lambda x: x["emotions"][2]["score"],axis=1)
+    def extract_emotions(self):
+        '''
+        Collate emotions predictions from all model configs into a CSV
+        '''
+        try:
+            # Extract top 3 emotions
+            self.extracted_results["top3_emotions"] = self.extracted_results.apply(lambda x: x["emotions"][:3],axis=1)
+            # Extract most dominant emotion
+            self.extracted_results["emotion1"] = self.extracted_results.apply(lambda x: x["emotions"][0]["name"],axis=1)
+            self.extracted_results["emotion1_score"] = self.extracted_results.apply(lambda x: x["emotions"][0]["score"],axis=1)
+            # Extract second most dominant emotion
+            self.extracted_results["emotion2"] = self.extracted_results.apply(lambda x: x["emotions"][1]["name"],axis=1)
+            self.extracted_results["emotion2_score"] = self.extracted_results.apply(lambda x: x["emotions"][1]["score"],axis=1)
+            # Extract third most dominant emotion
+            self.extracted_results["emotion3"] = self.extracted_results.apply(lambda x: x["emotions"][2]["name"],axis=1)
+            self.extracted_results["emotion3_score"] = self.extracted_results.apply(lambda x: x["emotions"][2]["score"],axis=1)
 
-        # except:
-        #     print("No faces detected")
-        #     pass
+        except:
+            print("No predictions available")
+            pass
 
     def average_predictions(self, emotions_list):
         '''Get average predictions of emotions for each group (face_id)'''
@@ -229,7 +234,6 @@ class HumeAPI:
             averaged_emotions_vburst_dict = {}
 
         try:
-            ########################## WORK ON THIS ##########################
             # Late fusion of emotions
             averaged_emotions_combined_dict = self.average_dicts(averaged_emotions_face_dict,averaged_emotions_prosody_dict,averaged_emotions_vburst_dict)
             occurring_emotions_dict = self.get_occurring_emotions(averaged_emotions_combined_dict)
@@ -239,7 +243,6 @@ class HumeAPI:
             self.aggregated_results["occurring_emotions_scores"] = [list(occurring_emotions_dict.values())]
             print(self.aggregated_results)
             self.aggregated_results["occurring_emotions_encoded"] = self.aggregated_results.apply(lambda x: self.encode_emotions_list(x["occurring_emotions"]), axis=1)
-            ########################## WORK ON THIS ##########################
         except Exception as e:
             print("Error aggregating emotions, ",e) # No faces detected
 
@@ -283,9 +286,8 @@ class HumeAPI:
         encoded_emotions = []
 
         for emotion in emotions_list:
-            print("emotions",emotion)
             encoded_emotions.append(self.map_emotions(emotion))
-            print("emotions",emotion, "Added")
+
         return encoded_emotions
 
     # For Sequential Pattern Mining (ie. PrefixSpan)
@@ -296,13 +298,24 @@ class HumeAPI:
             collated_results = pd.read_csv("./results/aggregated_emotions.csv")
             # Initialise column sequence
             collated_results["emotion_sequence"] = ""
+            # When enough rows of emotions collected
             if len(collated_results) >= sequences:
-                for i in range(len(collated_results)):
-                    collated_results.loc[i,["emotion_sequence"]] = collated_results.loc[max(0, i - sequences + 1):i + 1,["occurring_emotions_face"][0]].values.tolist()
-                    for j in collated_results.loc[i,["emotion_sequence"]]:
-                        for index, k in enumerate(j):
-                            j[index] = self.map_emotions(k) # Map emotions to an emotion ID for PatternMine
+                for i in range(len(collated_results)): # For each row
+                    sequence_list = collated_results.loc[max(0, i - sequences + 1):i + 1,["occurring_emotions"]].values.tolist() # Update each row with last n sequences
+                    collated_results.loc[i,["emotion_sequence"]] = sequence_list
 
+                    # Map emotions in the sequence_list using map_emotions(k)
+                    mapped_sequence = str([[self.map_emotions(emotion) for emotion in ast.literal_eval(sequence[0])] for sequence in sequence_list])
+
+                    # Update emotion_sequence column with the mapped sequence
+                    collated_results.loc[i, "emotion_sequence"] = mapped_sequence
+
+                    # # For each row j
+                    # for j in collated_results.loc[i,["emotion_sequence"]]:
+                    #     print("Jvalue",j)
+                    #     # For each sequence k in row j
+                    #     for index, k in enumerate(ast.literal_eval(j)):
+                    #         j[index] = self.map_emotions(k) # Map emotions to an emotion ID for PatternMine
 
                 self.export_sequence(collated_results,"./results/extracted_sequence.txt")
             else:

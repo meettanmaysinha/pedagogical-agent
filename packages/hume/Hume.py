@@ -30,7 +30,7 @@ class HumeAPI:
         # # Dataframes to store individual config results
         self.extracted_results_face = pd.DataFrame()
         self.extracted_results_prosody = pd.DataFrame()
-        self.extracted_results_vburst = pd.DataFrame()
+        # self.extracted_results_vburst = pd.DataFrame()
         # Dataframe with compiled results
         self.aggregated_results = pd.DataFrame()
         # self.pattern_mine = PatternMine()
@@ -81,52 +81,25 @@ class HumeAPI:
         # Opening JSON file for AV_ouput timestamps
         av_timestamps_json = open(f'./recordings/av_output/av_timestamps.json')
         av_timestamps = json.load(av_timestamps_json)
-        
-        # Extract Face predictions
-        try:
-            # Extract results from Hume API call
-            face_results = result["face"]["predictions"]
-            self.extracted_results_face = pd.json_normalize(face_results)
-
-        except KeyError:
-            print("No Faces Detected...")
-            self.extracted_results_face = pd.DataFrame()
-
-        # Extract Prosody predictions
-        try: 
-            prosody_results = result["prosody"]["predictions"]
-            self.extracted_results_prosody = pd.json_normalize(prosody_results)
-        except KeyError:
-            print("No Speech Prosody Detected...")
-            self.extracted_results_prosody = pd.DataFrame()
-        
-        # Extract Vocal Burst predictions
-        try:
-            vburst_results = result["vocal_burst"]["predictions"]
-            self.extracted_results_vburst = pd.json_normalize(vburst_results)
-        except KeyError:
-            print("No Vocal Bursts Detected...")
-            self.extracted_results_vburst = pd.DataFrame()
 
         # Clean and aggregate results
         try:
-            self.extract_emotions() # Store emotion predictions to CSV
+            self.extract_emotions(result) # Store emotion predictions to CSV
             self.aggregate_emotions() # Get frequency of emotions
             
             # Attach video id to results to determine sequence of videos
             self.extracted_results_face["video_name"] = video_name
             self.extracted_results_prosody["video_name"] = video_name
-            self.extracted_results_vburst["video_name"] = video_name
+            # self.extracted_results_vburst["video_name"] = video_name
             self.aggregated_results["video_name"] = video_name
 
             # Attach datetime to results to determine timestamp of videos
-            self.extracted_results["datetime"] = av_timestamps["output_" + str(video_name)]
             self.aggregated_results["datetime"] = av_timestamps["output_" + str(video_name)]
             
             # Append results of predictions by Models
             self.results_to_csv(self.extracted_results_face, "./results/extracted_face.csv", mode="a") 
             self.results_to_csv(self.extracted_results_prosody, "./results/extracted_prosody.csv", mode="a")
-            self.results_to_csv(self.extracted_results_vburst, "./results/extracted_vburst.csv", mode="a")
+            # # self.results_to_csv(self.extracted_results_vburst, "./results/extracted_vburst.csv", mode="a")
 
             # Append aggregated results
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a")
@@ -172,20 +145,37 @@ class HumeAPI:
             return None
         emotions.sort(key=lambda x: x['score'], reverse=True)
 
-    def extract_emotions(self):
+    def extract_emotions(self, result):
         '''
         Collate emotions predictions from all model configs into a CSV
         '''
+        # Extract Face predictions
         try:
-            extracted = {
-                "face_predictions":str(self.extracted_results_face),
-                "prosody_predictions":str(self.extracted_results_prosody),
-                "vburst_predictions":str(self.extracted_results_vburst)
-            }
-            self.extracted_results = pd.DataFrame(extracted, index=[0])
+            # Extract results from Hume API call
+            face_results = result["face"]["predictions"]
+            self.extracted_results_face = pd.json_normalize(face_results)
 
-        except KeyError as e:
-            print("No predictions available: ", e)
+        except KeyError:
+            print("No Faces Detected...")
+            self.extracted_results_face = pd.DataFrame()
+
+        # Extract Prosody predictions
+        try: 
+            prosody_results = result["prosody"]["predictions"]
+            self.extracted_results_prosody = pd.json_normalize(prosody_results)
+        except KeyError:
+            print("No Speech Prosody Detected...")
+            self.extracted_results_prosody = pd.DataFrame()
+        
+        # Extract Vocal Burst predictions
+        try:
+            pass # placeholder before VBurst is implemented
+            # vburst_results = result["vocal_burst"]["predictions"]
+            # # self.extracted_results_vburst = pd.json_normalize(vburst_results)
+        
+        except KeyError:
+            print("No Vocal Bursts Detected...")
+            # self.extracted_results_vburst = pd.DataFrame()
 
     def average_predictions(self, emotions_list):
         '''Get average predictions of emotions for each group (face_id)'''
@@ -234,15 +224,17 @@ class HumeAPI:
 
         # Vocal Burst Config
         try:
+            pass #Placeholder before VBurst implemented
             # Average prediction scores of emotions for the interval (Vocal Burst)
-            averaged_emotions_vburst_dict = self.average_predictions(self.extracted_results_vburst["emotions"])
+            # # averaged_emotions_vburst_dict = self.average_predictions(self.extracted_results_vburst["emotions"])
         except KeyError:
             print("No vocal burst predictions to aggregate") # No vocal bursts detected
-            averaged_emotions_vburst_dict = {}
+            # averaged_emotions_vburst_dict = {}
 
         try:
             # Late fusion of emotions
-            averaged_emotions_combined_dict = self.average_dicts(averaged_emotions_face_dict,averaged_emotions_prosody_dict,averaged_emotions_vburst_dict)
+            # averaged_emotions_combined_dict = self.average_dicts(averaged_emotions_face_dict,averaged_emotions_prosody_dict,averaged_emotions_vburst_dict) # Uncomment when Vocal Burst implemented
+            averaged_emotions_combined_dict = self.average_dicts(averaged_emotions_face_dict,averaged_emotions_prosody_dict) # Comment/Remove when vocal burst implemented
             occurring_emotions_dict = self.get_occurring_emotions(averaged_emotions_combined_dict)
 
             self.aggregated_results["occurring_emotions_dict"] = [occurring_emotions_dict]
@@ -252,7 +244,7 @@ class HumeAPI:
             self.aggregated_results["occurring_emotions_encoded"] = self.aggregated_results.apply(lambda x: self.encode_emotions_list(x["occurring_emotions"]), axis=1)
             
         except Exception as e:
-            print("Error aggregating emotions, ",e) # No faces detected
+            print("Error aggregating emotions") # No predictions
 
     def get_occurring_emotions(self, avg_emotions_dict, confidence_allowance=0.05):
         """
@@ -359,7 +351,7 @@ class HumeAPI:
                 self.export_utility(collated_results,"./results/extracted_utility.txt")
 
         except Exception as e:
-            print(e," Error extracting utility")
+            print("Error extracting utility, ", e)
             pass
     
     # For Frequent Item Set Mining

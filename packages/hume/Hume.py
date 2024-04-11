@@ -28,10 +28,9 @@ class HumeAPI:
         self.confidence_allowance = confidence_allowance
         
         # # Dataframes to store individual config results
-        self.extracted_results = pd.DataFrame()
-        self.extracted_results_face = {}
-        self.extracted_results_prosody = {}
-        self.extracted_results_vburst = {}
+        self.extracted_results_face = pd.DataFrame()
+        self.extracted_results_prosody = pd.DataFrame()
+        self.extracted_results_vburst = pd.DataFrame()
         # Dataframe with compiled results
         self.aggregated_results = pd.DataFrame()
         # self.pattern_mine = PatternMine()
@@ -70,10 +69,10 @@ class HumeAPI:
         client = HumeStreamClient(self.API_KEY) # Create Hume client
         config = [FaceConfig(identify_faces=True), ProsodyConfig()] # Create Hume config
 
-        # async with client.connect(config) as socket:
-        #     result = await socket.send_file(self.FILE_PATH)
-        #     with open(f'./{results_directory}/predictions.json', 'w', encoding='utf-8') as f:
-        #         json.dump(result, f, ensure_ascii=False, indent=4)
+        async with client.connect(config) as socket:
+            result = await socket.send_file(self.FILE_PATH)
+            with open(f'./{results_directory}/predictions.json', 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=4)
 
         # Opening JSON file
         f = open(f'./{results_directory}/predictions.json')
@@ -85,36 +84,47 @@ class HumeAPI:
         try:
             # Extract results from Hume API call
             face_results = result["face"]["predictions"]
-            self.extracted_results_face = face_results
+            self.extracted_results_face = pd.json_normalize(face_results)
+
         except KeyError:
             print("No Faces Detected...")
-            self.extracted_results_face = {}
+            self.extracted_results_face = pd.DataFrame()
 
         # Extract Prosody predictions
         try: 
             prosody_results = result["prosody"]["predictions"]
-            self.extracted_results_prosody = prosody_results
+            self.extracted_results_prosody = pd.json_normalize(prosody_results)
         except KeyError:
             print("No Speech Prosody Detected...")
-            self.extracted_results_prosody = {}
+            self.extracted_results_prosody = pd.DataFrame()
         
         # Extract Vocal Burst predictions
         try:
             vburst_results = result["vocal_burst"]["predictions"]
-            self.extracted_results_vburst = vburst_results
+            self.extracted_results_vburst = pd.json_normalize(vburst_results)
         except KeyError:
             print("No Vocal Bursts Detected...")
-            self.extracted_results_vburst = {}
+            self.extracted_results_vburst = pd.DataFrame()
 
         # Clean and aggregate results
         try:
             self.extract_emotions() # Store emotion predictions to CSV
             self.aggregate_emotions() # Get frequency of emotions
+            
             # Attach video id to results to determine sequence of videos
-            self.extracted_results["video_name"] = video_name
+            self.extracted_results_face["video_name"] = video_name
+            self.extracted_results_prosody["video_name"] = video_name
+            self.extracted_results_vburst["video_name"] = video_name
             self.aggregated_results["video_name"] = video_name
-            self.results_to_csv(self.extracted_results, "./results/extracted_emotions.csv", mode="a") # Append results to extracted_emotions.csv
-            self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a") # Append results to aggregated_emotions.csv
+            
+            # Append results of predictions by Models
+            self.results_to_csv(self.extracted_results_face, "./results/extracted_face.csv", mode="a") 
+            self.results_to_csv(self.extracted_results_prosody, "./results/extracted_prosody.csv", mode="a")
+            self.results_to_csv(self.extracted_results_vburst, "./results/extracted_vburst.csv", mode="a")
+
+            # Append aggregated results
+            print(self.aggregated_results)
+            self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a")
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
             self.extract_utility() # Get utility for emotions
@@ -153,7 +163,6 @@ class HumeAPI:
 
     def sort_emotions(self, emotions):
         '''Sorts emotions by scores in descending order'''
-        print(emotions)
         # No Predictions
         if len(emotions) == 0:
             return None
@@ -237,6 +246,7 @@ class HumeAPI:
             self.aggregated_results["occurring_emotions_scores"] = [list(occurring_emotions_dict.values())]
             print(self.aggregated_results)
             self.aggregated_results["occurring_emotions_encoded"] = self.aggregated_results.apply(lambda x: self.encode_emotions_list(x["occurring_emotions"]), axis=1)
+            
         except Exception as e:
             print("Error aggregating emotions, ",e) # No faces detected
 

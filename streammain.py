@@ -1,6 +1,7 @@
 # main.py
 import asyncio
 from VideoProcessor import VideoProcessor
+from packages.pipeline.gpt import run_agent_api
 from packages.emotionpattern.PatternMine import PatternMine
 import time
 from dotenv import load_dotenv
@@ -26,6 +27,10 @@ def main():
     confidence_allowance : float
         Confidence score allowance for emotions to be co-occurring (default = 0.05)
     ''' 
+    # Run Flask app for Agent API
+    run_agent_api()
+
+    # Video recording and Hume predictions
     video_processor = VideoProcessor(API_KEY, interval=5, recording_folder="recordings", confidence_allowance = 0.05)
     
     # Pattern Mining Algorithms

@@ -74,12 +74,14 @@ class HumeAPI:
             with open(f'./{results_directory}/predictions.json', 'w', encoding='utf-8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=4)
 
-        # Opening JSON file
-        f = open(f'./{results_directory}/predictions.json')
-        # returns JSON object as 
-        # a dictionary
+        # Opening JSON file for predictions
+        f = open(f'./{results_directory}/predictions.json') # returns prediction results as a dictionary
         result = json.load(f)
 
+        # Opening JSON file for AV_ouput timestamps
+        av_timestamps_json = open(f'./recordings/av_output/av_timestamps.json')
+        av_timestamps = json.load(av_timestamps_json)
+        
         # Extract Face predictions
         try:
             # Extract results from Hume API call
@@ -116,6 +118,10 @@ class HumeAPI:
             self.extracted_results_prosody["video_name"] = video_name
             self.extracted_results_vburst["video_name"] = video_name
             self.aggregated_results["video_name"] = video_name
+
+            # Attach datetime to results to determine timestamp of videos
+            self.extracted_results["datetime"] = av_timestamps["output_" + str(video_name)]
+            self.aggregated_results["datetime"] = av_timestamps["output_" + str(video_name)]
             
             # Append results of predictions by Models
             self.results_to_csv(self.extracted_results_face, "./results/extracted_face.csv", mode="a") 

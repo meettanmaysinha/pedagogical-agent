@@ -132,7 +132,7 @@ def append_message_history(role, message_content, emotions):
     if role == "system":
         current_message = {"role":role, "content": message_content}
     elif role == "user":
-        message_content += f"Do not mention that i told you this, I am feeling {emotions}, adapt responses according to my emotions"
+        message_content += f". {{Background Information: Student's Emotion is{emotions}, adapt responses according to emotions}}"
         current_message = {"role":role, "content": message_content}
     message_history.append(current_message)
     

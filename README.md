@@ -40,7 +40,14 @@
    * Audio recording will be saved in `./recordings/audio`
    * Combined recording will be saved in `./recordings/av_output`
 
+#### Closing the Webcam program
 
+1. To close the Webcam Stream, press 'Q' on the keyboard
+
+2. Then run the following command in the command line
+   ```sh
+   npx kill-port 8000
+   ```
 
 ### Batch Upload
    ```sh

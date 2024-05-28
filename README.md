@@ -19,10 +19,13 @@
 
    #### For Windows, follow [these](https://phoenixnap.com/kb/ffmpeg-windows) instructions
 
-3. Create a file called `api_key.py` *(Already Created)*
+3. Create a file called `.env` *(Already Created)*
+   
    ```py
-   const API_KEY = 'ENTER YOUR API';
+   HUME_API_KEY = 'HUME_API_KEY'
+   OPENAI_API_KEY = 'OPENAI_API_KEY'
    ```
+   *API Keys to be reset before deployment, .env to be added to .gitignore*
 
 <!-- Scripts -->
 ## Main Scripts
@@ -37,7 +40,14 @@
    * Audio recording will be saved in `./recordings/audio`
    * Combined recording will be saved in `./recordings/av_output`
 
+#### Closing the Webcam program
 
+1. To close the Webcam Stream, press 'Q' on the keyboard
+
+2. Then run the following command in the command line
+   ```sh
+   npx kill-port 8000
+   ```
 
 ### Batch Upload
    ```sh
@@ -165,6 +175,24 @@ Boredom | Boredom | Boredom | Boredom | #SUP: 27
 - #### When combining Audio and Video, FFmpeg cuts off AV recording at 5s mark
    - Combined Video and Audio recording is limited to 5s recording to fit into Hume’s limit
    - Audio & Video recordings are separately recorded and saved at 5 seconds intervals
+- #### When extracting emotion results from Hume models, emotion with highest average confidence across the models is selected
+   - Example: In this prediction, the emotions will be averaged and the highest score will be extracted
+      <table>
+         <tr>
+            <th>FaceModel</th>
+            <td>Anger: 0.6 <br> Boredom: 0.2 <br> Confusion: 0.8 </td>
+         </tr>
+         <tr>
+            <th>ProsodyModel</th>
+            <td>Anger: 0.4 <br> Boredom: 0.4 <br> Confusion: 0.7 </td>
+         </tr>
+         <tr>
+            <th>Averaged Emotions</th>
+            <td>Anger: 0.5 <br> Boredom: 0.3 <br> Confusion: 0.75 </td>
+         </tr>
+      </table>
+
+   - Confusion will be the most dominant emotion with an average score of 0.75
 
 
 ### Video Recording

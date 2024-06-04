@@ -72,7 +72,7 @@ def get_chat_response(message_content, emotions):
     )
 
     # Save Agents' response into chat history
-    append_message_history("system", completion.choices[0].message.content, None)
+    append_message_history("assistant", completion.choices[0].message.content, None)
 
     return completion.choices[0].message.content
 
@@ -88,7 +88,7 @@ def get_emotions():
 
 def get_message_history():
     """
-    Returns a history of the chat mesages between User and System
+    Returns a history of the chat mesages between User and Assistant
 
     Used to provide context for the Agent to respond
     """
@@ -126,7 +126,7 @@ def append_message_history(role, message_content, emotions):
         with open("message_history.json", "w") as file:
             json.dump(message_history, file)
 
-    if role == "system":
+    if role == "assistant":
         current_message = {"role":role, "content": message_content}
     elif role == "user":
         message_content = f"{{Message: '{message_content}'," + f"Background_Information: 'Student's Emotion is {emotions}. If needed, adapt responses according to emotions without explicitly mentioning it.'}}"

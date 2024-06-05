@@ -26,9 +26,10 @@ config = configparser.ConfigParser()
 config.read("./agent_prompts/config.ini")
 
 # Access agent conversation prompts
-section = "agentprompts"
-initial_agent_prompt = config[section]["initial_agent_prompt"]
-student_prompt = config[section]["student_prompt"]
+prompts = "agentprompts"
+initial_agent_prompt = config[prompts]["initial_agent_prompt"]
+student_prompt = config[prompts]["student_prompt"]
+FEW_SHOT_PATH = "./agent_prompts/prompt_examples.csv"
 
 # Function to start Flask for the Agent API endpoint
 def run_agent_api():
@@ -77,6 +78,17 @@ def api_get_chat_response():
 
         return jsonify({"response": response}), 200
 
+def read_examples_from_csv(file_path):
+    """
+    Read prompt examples from CSV
+    """
+    examples = []
+    with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            examples.append(row)
+    return examples
+
 def get_chat_response(message_content, emotions):
     # Save User's message into chat history
     append_message_history("user", message_content, emotions)
@@ -116,6 +128,7 @@ def get_message_history():
         # Create file with preset prompts
         message_history = [
             {"role":"system", "content":initial_agent_prompt},
+            {"role":"system", "content":"You may use these examples as guidance: \n" + str(read_examples_from_csv(FEW_SHOT_PATH))},
             {"role":"user","content": student_prompt}
         ]
         with open("./agent_prompts/message_history.json", "w") as file:
@@ -137,6 +150,7 @@ def append_message_history(role, message_content, emotions):
         # Create file with preset prompts
         message_history = [
             {"role":"system", "content":initial_agent_prompt},
+            {"role":"system", "content":"You may use these examples as guidance: \n" + str(read_examples_from_csv(FEW_SHOT_PATH))},
             {"role":"user","content": student_prompt}
         ]
         with open("./agent_prompts/message_history.json", "w") as file:
@@ -174,16 +188,7 @@ def agent_stage(stage_number):
         case _:
             pass
 
-def read_examples_from_csv(file_path):
-    """
-    Read prompt examples from CSV
-    """
-    examples = []
-    with open(file_path, mode='r', newline='', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            examples.append(row)
-    return examples
+
 
 if __name__ == '__main__':
     port = 8000 # Default port set to 8000

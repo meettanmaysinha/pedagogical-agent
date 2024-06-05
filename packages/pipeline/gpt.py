@@ -6,14 +6,30 @@ import os
 import pandas as pd
 import subprocess
 import json
+import csv
+import configparser
+
+
 
 # Load the environment variables
 load_dotenv()
 
 # Initialise the OpenAI API
 openai = OpenAI(
-    api_key = os.getenv('OPENAI_API_KEY')
+    api_key = os.getenv("OPENAI_API_KEY")
 )
+
+# Create a ConfigParser object
+config = configparser.ConfigParser()
+
+# Read the configuration file for prompts
+config.read("./agent_prompts/config.ini")
+
+# Access agent conversation prompts
+prompts = "agentprompts"
+initial_agent_prompt = config[prompts]["initial_agent_prompt"]
+student_prompt = config[prompts]["student_prompt"]
+FEW_SHOT_PATH = "./agent_prompts/prompt_examples.csv"
 
 # Function to start Flask for the Agent API endpoint
 def run_agent_api():
@@ -62,6 +78,17 @@ def api_get_chat_response():
 
         return jsonify({"response": response}), 200
 
+def read_examples_from_csv(file_path):
+    """
+    Read prompt examples from CSV
+    """
+    examples = []
+    with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            examples.append(row)
+    return examples
+
 def get_chat_response(message_content, emotions):
     # Save User's message into chat history
     append_message_history("user", message_content, emotions)
@@ -72,7 +99,7 @@ def get_chat_response(message_content, emotions):
     )
 
     # Save Agents' response into chat history
-    append_message_history("system", completion.choices[0].message.content, None)
+    append_message_history("assistant", completion.choices[0].message.content, None)
 
     return completion.choices[0].message.content
 
@@ -88,25 +115,27 @@ def get_emotions():
 
 def get_message_history():
     """
-    Returns a history of the chat mesages between User and System
+    Returns a history of the chat mesages between User and Assistant
 
     Used to provide context for the Agent to respond
     """
     # Check if the file exists, if not, create it with preset prompts
     try:
         # Load message history from JSON file
-        with open("message_history.json", "r") as file:
+        with open("./agent_prompts/message_history.json", "r") as file:
             message_history = json.load(file)
     except FileNotFoundError:
         # Create file with preset prompts
         message_history = [
-            {"role":"system", "content":"You are a friendly and helpful programming mentor whose goal is to give students feedback to improve their work, and good at explaining complex programming concepts. Do not share answers with the student. Plan each step ahead of time before moving on. First, greet the students and ask them to ask you any doubts they have on their work. Wait for a response. The students may bring up issues or errors in their code. Provide some guidance on their work and guide them to solve their problems. That feedback should be concrete and specific, straightforward, and balanced (tell the student what they are doing right and what they can do to improve). Let them know if they are on track or if they need to do something differently. Then ask students to try it again, that is to revise their code based on your feedback. Wait for a response. Once they ask again, question students if they would like feedback on that revision. If students do not want feedback, encourage them, taking note of their emotions they are feeling and provide some encouragement. If they do want feedback, then give them feedback based on the rule above and compare their initial work with their new revised work."},
-            {"role":"user","content": "I am a student who is facing issues with my code. For issues, I will be providing you with the cell content, or specific programming issues from a Python Notebook. If cell contents or code is provided, for each error/output in output, the code snippet is in source. Sometimes, I may be feeling a certain emotion, help me understand my problems better by providing some social support and guide me through my answers, as you are a teacher. Give me the error code snippet in source by quoting it. Do not explicitly mention the dataset given to you, but you may mention its values."}
+            {"role":"system", "content":initial_agent_prompt},
+            {"role":"system", "content":"You may use these examples as guidance: \n" + str(read_examples_from_csv(FEW_SHOT_PATH))},
+            {"role":"user","content": student_prompt}
         ]
-        with open("message_history.json", "w") as file:
+        with open("./agent_prompts/message_history.json", "w") as file:
             json.dump(message_history, file)
 
     return message_history
+
 
 def append_message_history(role, message_content, emotions):
     """
@@ -115,18 +144,19 @@ def append_message_history(role, message_content, emotions):
     # Check if the file exists, if not, create it with preset prompts
     try:
         # Load message history from JSON file
-        with open("message_history.json", "r") as file:
+        with open("./agent_prompts/message_history.json", "r") as file:
             message_history = json.load(file)
     except FileNotFoundError:
         # Create file with preset prompts
         message_history = [
-            {"role":"system", "content":"You are a friendly and helpful programming mentor whose goal is to give students feedback to improve their work, and good at explaining complex programming concepts. Do not share answers with the student. Plan each step ahead of time before moving on. First, greet the students and ask them to ask you any doubts they have on their work. Wait for a response. The students may bring up issues or errors in their code. Provide some guidance on their work and guide them to solve their problems. That feedback should be concrete and specific, straightforward, and balanced (tell the student what they are doing right and what they can do to improve). Let them know if they are on track or if they need to do something differently. Then ask students to try it again, that is to revise their code based on your feedback. Wait for a response. Once they ask again, question students if they would like feedback on that revision. If students don’t want feedback, encourage them, taking note of their emotions they are feeling and provide some encouragement. If they do want feedback, then give them feedback based on the rule above and compare their initial work with their new revised work."},
-            {"role":"user","content": "I am a student who is facing issues with my code. For issues, I will be providing you with the cell content, or specific programming issues from a Python Notebook. If cell contents or code is provided, for each error/output in output, the code snippet is in source. Sometimes, I may be feeling a certain emotion, help me understand my problems better by providing some social support and guide me through my answers, as you are a teacher. Give me the error code snippet in source by quoting it. Do not explicitly mention the dataset given to you, but you may mention its values."}
+            {"role":"system", "content":initial_agent_prompt},
+            {"role":"system", "content":"You may use these examples as guidance: \n" + str(read_examples_from_csv(FEW_SHOT_PATH))},
+            {"role":"user","content": student_prompt}
         ]
-        with open("message_history.json", "w") as file:
+        with open("./agent_prompts/message_history.json", "w") as file:
             json.dump(message_history, file)
 
-    if role == "system":
+    if role == "assistant":
         current_message = {"role":role, "content": message_content}
     elif role == "user":
         message_content = f"{{Message: '{message_content}'," + f"Background_Information: 'Student's Emotion is {emotions}. If needed, adapt responses according to emotions without explicitly mentioning it.'}}"
@@ -134,7 +164,7 @@ def append_message_history(role, message_content, emotions):
     message_history.append(current_message)
     
     # Save data to JSON file
-    with open("message_history.json", "w") as file:
+    with open("./agent_prompts/message_history.json", "w") as file:
         json.dump(message_history, file, indent=4)  # indent=4 for pretty formatting
     
 def agent_stage(stage_number):
@@ -157,6 +187,8 @@ def agent_stage(stage_number):
         # If stage_number does not match
         case _:
             pass
+
+
 
 if __name__ == '__main__':
     port = 8000 # Default port set to 8000

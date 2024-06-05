@@ -18,3 +18,6 @@ packages/DUMP/video_recorder.py
 packages/DUMP/AVRecorder.py
 recordings/av_output/av_timestamps.json
 message_history.json
+
+# Do not ignore
+!prompt_examples.csv

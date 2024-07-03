@@ -71,7 +71,7 @@ def api_get_chat_response():
         emotions = get_emotions()
         print(message_content)
         print(emotions)
-        if message_content is None or emotions is None:
+        if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
 
         response = get_chat_response(message_content, emotions)
@@ -109,9 +109,13 @@ def get_emotions():
 
     Retrieves emotions from aggregated_emotions.csv, where the fused emotions are stored
     """
-    aggregated_emotions = pd.read_csv("./results/aggregated_emotions.csv")
-    student_emotions = aggregated_emotions[["occurring_emotions", "datetime"]]
-    return student_emotions.iloc[-1, 0]
+    try:
+        aggregated_emotions = pd.read_csv("./results/aggregated_emotions.csv")
+        student_emotions = aggregated_emotions[["occurring_emotions", "datetime"]]
+        return student_emotions.iloc[-1, 0]
+    except FileNotFoundError:
+        # If no emotions recorded
+        return None
 
 def get_message_history():
     """

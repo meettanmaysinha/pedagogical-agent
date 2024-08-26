@@ -82,16 +82,17 @@ Here are some of the key features of the Pedagogical Agent:
         └── video          # Video Recordings
         └── av_output      # Combined AV Recordings (Hume AI input)
     ├── packages           # Packages and modules required for software
-    ├── results           # Predictions and Pattern Mining Results
+    ├── results            # Predictions and Pattern Mining Results
         └── extracted_emotions.csv       # Predictions of Hume AI
         └── aggregated_emotions.csv      # Aggregated and cleaned results
         └── extracted_sequence.txt       # Input sequence of emotions for Sequence Mining
         └── output_sequence.txt          # Output results of Sequence Mining
-    ├── apikey.py          # API Key for Hume AI
+    ├── .env               # Required for Hume AI and OpenAI API Key
     ├── batchmain.py       # Main script for batch uploader
-    ├── batchuploader.py   # Main script for batch uploader
+    ├── batchuploader.py   # Functions for batch uploader
     ├── requirements.txt   # List of packages or libraries to be installed
-    ├── VideoProcessor.py  # Handles Hume API calls
+    ├── streammain,py      # Main script for Pedagogical Agent
+    ├── VideoProcessor.py  # Handles Hume API calls and Webcam recordings
     └── spmf.jar           # Algorithms for Pattern Mining
     
 ### Batch Uploader
@@ -101,6 +102,9 @@ Allows user to upload a video or audio file for processing of emotions
 - *`batchuploader.py`*
    - Functions for uploading of video or audio file
 
+### Pedagogical Agent
+- *`VideoProcessor.py`*
+   - Functions for processing of Webcam and Microphone into Video and Audio
 - *`streammain.py`*
    - Main file to run for the Pedagogical Agent
 

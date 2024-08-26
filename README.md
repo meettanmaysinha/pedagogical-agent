@@ -1,5 +1,18 @@
 <!-- GETTING STARTED -->
 ## Getting Started
+
+### Introduction
+
+The Pedagogical Agent is designed to enhance pedagogical methods through the introduction of emotional analysis and response generation using Large Language Models (LLMs). This documentation is your comprehensive guide to making the most of our application.
+
+### **Key Features**
+
+Here are some of the key features of the Pedagogical Agent:
+
+- **Feature 1**: Emotions Analysis
+- **Feature 2**: Response Generation with LLMs
+- **And More (In development)**: Pattern Mining of Results
+
 ### Prerequisites
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)   						![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 
@@ -19,7 +32,7 @@
 
    #### For Windows, follow [these](https://phoenixnap.com/kb/ffmpeg-windows) instructions
 
-3. Create a file called `.env` *(Already Created)*
+3. Create a file called `.env`
    
    ```py
    HUME_API_KEY = 'HUME_API_KEY'
@@ -62,7 +75,7 @@
 <!-- FILES -->
 ## Files
 
-#### Main Folders and Classes
+### Main Folders and Classes
     .
     ├── recordings         # Webcam Recordings
         └── audio          # Audio Recordings
@@ -81,6 +94,16 @@
     ├── VideoProcessor.py  # Handles Hume API calls
     └── spmf.jar           # Algorithms for Pattern Mining
     
+### Batch Uploader
+Allows user to upload a video or audio file for processing of emotions
+- *`batchmain.py`*
+   - Streamlit interface for *`batchuploader.py`*
+- *`batchuploader.py`*
+   - Functions for uploading of video or audio file
+
+- *`streammain.py`*
+   - Main file to run for the Pedagogical Agent
+
 
 <!-- USAGE -->
 ## Usage

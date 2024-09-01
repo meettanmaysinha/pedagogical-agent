@@ -5,6 +5,8 @@
 
 The Pedagogical Agent is designed to enhance pedagogical methods through the introduction of emotional analysis and response generation using Large Language Models (LLMs). This documentation is your comprehensive guide to making the most of our application.
 
+For development, refer to the Development section at the end of this README
+
 ### **Key Features**
 
 Here are some of the key features of the Pedagogical Agent:
@@ -94,20 +96,6 @@ Here are some of the key features of the Pedagogical Agent:
     ├── streammain,py      # Main script for Pedagogical Agent
     ├── VideoProcessor.py  # Handles Hume API calls and Webcam recordings
     └── spmf.jar           # Algorithms for Pattern Mining
-    
-### Batch Uploader
-Allows user to upload a video or audio file for processing of emotions
-- *`batchmain.py`*
-   - Streamlit interface for *`batchuploader.py`*
-- *`batchuploader.py`*
-   - Functions for uploading of video or audio file
-
-### Pedagogical Agent
-- *`VideoProcessor.py`*
-   - Functions for processing of Webcam and Microphone into Video and Audio
-- *`streammain.py`*
-   - Main file to run for the Pedagogical Agent
-
 
 <!-- USAGE -->
 ## Usage
@@ -252,3 +240,47 @@ Update SSL certificate with certifi (MacOS only)
 - [SPMF Algorithms](https://www.philippe-fournier-viger.com/spmf/index.php?link=algorithms.php)
 - [OpenAI Quickstart](https://platform.openai.com/docs/quickstart?context=python)
 - [OpenAI Streaming](https://platform.openai.com/docs/api-reference/introduction?lang=python)
+
+
+# Development
+For development of the pedagogical agent, these are the key files to take note of:
+
+### Batch Uploader
+Allows user to upload a video or audio file for processing of emotions
+- *`batchmain.py`*
+   - Streamlit interface for *`batchuploader.py`*
+- *`batchuploader.py`*
+   - Functions for uploading of video or audio file
+- *`packages/batchsplitter/ffmpeg-split.py`*
+   - Currently not implemented
+   - Splits the input file into smaller batches
+
+### Pedagogical Agent
+- *`VideoProcessor.py`*
+   - Functions for processing of Webcam and Microphone into Video and Audio
+- *`streammain.py`*
+   - Main file to run for the Pedagogical Agent
+
+### Hume
+- *`packages/hume/Hume.py`*
+   - API calls to Hume for processing of emotions
+   - Aggregation of emotions' confidence scores
+   - Saving of results file
+   - Extracting of sequences of emotions, utility and frequency for SPMF algorithms (Not fully implemented)
+   - Mapping of emotions to a numeric ID for SPMF algorithms
+
+### GPT Connection
+- *`packages/pipeline/gpt.py`*
+   - Connection to the LLM model responsible for generating responses
+   - Message history
+   - Get examples for emotions-responses (Few Shot)
+   - Stages for Agent prompts (Not yet implemented)
+   - Flask connection to the Front End
+
+### Pattern Mining (Not fully implemented)
+- Currently not included in the response generation of the PA, but some of the algorithms have been implemented
+- *`packages/emotionpattern/emotions_dict.py`*
+   - ID Mapping of Emotions to a numeric ID
+   - Used in `Hume.py`
+- *`packages/emotionpattern/PatternMine.py`*
+   - Run a specified SPMF algorithm

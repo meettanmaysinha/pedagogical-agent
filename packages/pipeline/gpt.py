@@ -94,7 +94,7 @@ def get_chat_response(message_content, emotions):
     append_message_history("user", message_content, emotions)
 
     completion = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=get_message_history(),
     )
 

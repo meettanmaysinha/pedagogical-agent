@@ -184,7 +184,7 @@ Boredom | Boredom | Boredom | Boredom | #SUP: 27
 `|` represents the divider between item sets
 `#SUP` indicates the support of the pattern in the dataset
 
-# Decisions made during script development (~hyperparameters) 
+# Decisions made during script development
 
 ### Hume 
 - #### When combining Audio and Video, FFmpeg cuts off AV recording at 5s mark

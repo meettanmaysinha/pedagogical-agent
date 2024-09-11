@@ -156,7 +156,7 @@ Prediction results from Hume are extracted into the `extracted_emotions.csv` fil
 }
    ```
 
-#### Summarised Predictions   
+#### Summarized Predictions   
 Results are then aggregated into `aggregated_emotions.csv` which identifies the emotion with highest prediction score (~confidence), and the most frequently shown emotion in each interval.
   ```json
    {

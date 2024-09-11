@@ -3,7 +3,7 @@
 
 ### Introduction
 
-The Pedagogical Agent is designed to provide adaptive scaffolding through the introduction of emotional analysis and response generation using Large Language Models (LLMs). This documentation is your comprehensive guide to making the most of our application.
+This Pedagogical Agent is designed to provide adaptive scaffolding through the introduction of emotional analysis and response generation using Large Language Models (LLMs). This documentation is your comprehensive guide to making the most of our application.
 
 For development, refer to the Development section at the end of this README
 
@@ -138,7 +138,7 @@ Prediction results from Hume are extracted into the `extracted_emotions.csv` fil
 	  "time": null,
 	  "prob": 0.9996715784072876,
 	  "face_id": "face_0",
-	  "emotions": "[{'name': 'Disappointment', 'score': 0.36673504114151}, {'name': 'Sadness', 'score': 0.3661433458328247},  
+	  "emotions": "[{'name': 'Disappointment', 'score': 0.36673504114151}, {'name': 'Sadness', 'score': 0.3661433458328247}]",  
 	  "bbox": {
 	    "x": 1168.461181640625,
 	    "y": 570.3857421875,

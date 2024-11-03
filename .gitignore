@@ -1,4 +1,5 @@
 # apikey.py # API Key for Hume AI
+.env
 __pycache__
 predictions.json
 extracted_sequence.txt

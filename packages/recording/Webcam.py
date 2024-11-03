@@ -12,7 +12,7 @@ class Webcam:
         self.recording_folder = recording_folder
 
     def start(self, fps=20.0):
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1)
         self.fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
         self.fps = fps
         self.video_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))

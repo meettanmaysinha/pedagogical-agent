@@ -18,9 +18,9 @@ class VideoProcessor:
         self.audio = AudioRecorder() # Create instance of AudioRecorder
         self.interval = interval
         self.recording_folder = recording_folder
-
+    
     def start_webcam(self):
-        # self.webcam.start_AVrecording() # Start webcam
+        #self.webcam.start_AVrecording() # Start webcam
         self.webcam.start()
         self.audio.start()
 

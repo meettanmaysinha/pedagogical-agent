@@ -66,6 +66,7 @@ def api_get_chat_response():
     If any required parameters are missing, it returns a JSON response with an error message.
     """
     if request.method == 'POST':
+        print("test",request.method)
         data = request.json  # Assuming the data is sent in JSON format
         message_content = data.get('message_content')
         emotions = get_emotions()

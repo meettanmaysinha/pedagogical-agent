@@ -69,7 +69,7 @@ class VideoProcessor:
         while self.webcam.is_opened:
             ret, frame = self.webcam.read()
             out.write(frame)
-            cv2.imshow('Webcam Feed', frame)
+            #cv2.imshow('Webcam Feed', frame)
             
             # If video length longer than 5s, save video (Hume Max Video Length is 5s)
             if time.time() - start_time > 5: 

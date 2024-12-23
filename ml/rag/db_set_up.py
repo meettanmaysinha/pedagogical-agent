@@ -13,14 +13,13 @@ client.create_collection(
     collection_name="collection_demo",
     dimension=768,  # The vectors we will use in this demo has 768 dimensions
 )
-embedding_fn = model.DefaultEmbeddingFunction()
-"""
-embedding_fn =  model.dense.SentenceTransformerEmbeddingFunction(
-    model_name='jinaai/jina-embeddings-v2-base-en', # Specify the model name
-    device='cpu' # Specify the device to use, e.g., 'cpu' or 'cuda:0'
-)
-"""
+#embedding_fn = model.DefaultEmbeddingFunction()
 
+embedding_fn =  model.dense.SentenceTransformerEmbeddingFunction(
+    model_name='cornstack/CodeRankEmbed', # Specify the model name
+    device='cpu', # Specify the device to use, e.g., 'cpu' or 'cuda:0'
+    trust_remote_code=True  
+)
 
 with open("docs/numpy.txt", "r", encoding="utf-8") as file:
     text = file.read()
@@ -32,9 +31,6 @@ vectors = embedding_fn.encode_documents(first_lines)
 data = [
     {"id": i, "vector": vectors[i], "text": numpy_examples[i]} for i in range(len(vectors))
 ]
-print("Data has", len(data), "entities, each with fields: ", data[0].keys())
-print("Vector dim:", len(data[0]["vector"]))
 res = client.insert(collection_name="collection_demo", data=data)
-print(res)
 
 

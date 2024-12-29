@@ -76,3 +76,5 @@ class AudioRecorder():
             self.audio_frames = []
             print("Audio saved" + audio_file_name)
             
+        def is_open(self):
+            return self.stream.is_active()

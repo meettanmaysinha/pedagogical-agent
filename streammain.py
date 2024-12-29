@@ -1,4 +1,5 @@
 # main.py
+import argparse
 import asyncio
 from VideoProcessor import VideoProcessor
 from packages.pipeline.gpt import run_agent_api
@@ -9,6 +10,16 @@ import os
 
 load_dotenv()
 API_KEY = os.getenv("HUME_API_KEY")
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Run video/audio processing with optional modes.")
+    parser.add_argument(
+        "--mode", 
+        choices=["audio", "video", "both"], 
+        default="both", 
+        help="Specify the processing mode: 'audio', 'video', or 'both' (default)."
+    )
+    return parser.parse_args()
 
 def main():
     # Video Streaming Processor
@@ -27,11 +38,12 @@ def main():
     confidence_allowance : float
         Confidence score allowance for emotions to be co-occurring (default = 0.05)
     ''' 
+    args = parse_arguments()
     # Run Flask app for Agent API
     run_agent_api()
     
     # Video recording and Hume predictions
-    video_processor = VideoProcessor(API_KEY, interval=5, recording_folder="recordings", confidence_allowance = 0.05)
+    video_processor = VideoProcessor(API_KEY, interval=5, recording_folder="recordings", confidence_allowance = 0.05, mode = args.mode)
     
     # Pattern Mining Algorithms
     seq_pattern_mine = PatternMine("PrefixSpan") # Prefix Span algorithm for Sequential Pattern Mining
@@ -41,7 +53,7 @@ def main():
     
     loop = asyncio.get_event_loop()
     video_processor.start_webcam()
-    loop.run_until_complete(video_processor.process_video())
+    loop.run_until_complete(video_processor.process_frames())
 
     time.sleep(5) # Delay to allow async tasks to clear
     print("Running Pattern Mining Algorithms...")

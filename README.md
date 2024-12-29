@@ -50,6 +50,17 @@ Here are some of the key features of the Pedagogical Agent:
    ```sh
    python streammain.py
    ```
+   By default, the program streams both audio and video. You can specify the mode using the --mode option. The available modes are:
+   * audio
+   * video
+   * both (default)
+
+   To stream in audio mode only, use:
+   
+   ```sh
+   python streammain.py --mode audio
+   ```
+
    Webcam will turn on and recordings will be saved in the `./recordings` folder
    * Video recording will be saved in `./recordings/video` 
    * Audio recording will be saved in `./recordings/audio`

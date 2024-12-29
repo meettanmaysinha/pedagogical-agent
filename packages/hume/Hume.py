@@ -10,7 +10,7 @@ import json
 import ast
 
 class HumeAPI:
-    def __init__(self, api_key, file_path, confidence_allowance=0.05):
+    def __init__(self, api_key, file_path, confidence_allowance=0.05,mode="both"):
         """Creates instance of HumeAI API to get emotions predictions
         Parameters
         ----------
@@ -26,7 +26,8 @@ class HumeAPI:
         self.API_KEY = api_key
         self.FILE_PATH = file_path
         self.confidence_allowance = confidence_allowance
-        
+        self.mode= mode
+
         # # Dataframes to store individual config results
         self.extracted_results_face = pd.DataFrame()
         self.extracted_results_prosody = pd.DataFrame()
@@ -67,7 +68,12 @@ class HumeAPI:
         os.makedirs(results_directory, exist_ok=True)
         
         client = HumeStreamClient(self.API_KEY) # Create Hume client
-        config = [FaceConfig(identify_faces=True), ProsodyConfig()] # Create Hume config
+        if self.mode =="audio":
+            config = [ProsodyConfig()]
+        elif self.mode=="video":
+            config = [FaceConfig(identify_faces=True)]
+        else:
+            config = [FaceConfig(identify_faces=True), ProsodyConfig()] # Create Hume config
 
         async with client.connect(config) as socket:
             result = await socket.send_file(self.FILE_PATH)
@@ -83,32 +89,38 @@ class HumeAPI:
         av_timestamps = json.load(av_timestamps_json)
 
         # Clean and aggregate results
-        try:
+        try:        
             self.extract_emotions(result) # Store emotion predictions to CSV
             self.aggregate_emotions() # Get frequency of emotions
-            
-            # Attach video id to results to determine sequence of videos
-            self.extracted_results_face["video_name"] = video_name
-            self.extracted_results_prosody["video_name"] = video_name
-            # self.extracted_results_vburst["video_name"] = video_name
-            self.aggregated_results["video_name"] = video_name
 
-            # Attach datetime to results to determine timestamp of videos
-            self.aggregated_results["datetime"] = av_timestamps["output_" + str(video_name)]
+            # Attach video id to results to determine sequence of videos
+            if self.mode in ["video","both"]:
+                self.extracted_results_face["video_name"] = video_name
+
+            #process audio
+            if self.mode in ["audio", "both"]:
+                self.extracted_results_prosody["video_name"] = video_name
+            # self.extracted_results_vburst["video_name"] = video_name
+            if self.mode == "both":
+                self.aggregated_results["video_name"] = video_name
+                # Attach datetime to results to determine timestamp of videos
+                self.aggregated_results["datetime"] = av_timestamps["output_" + str(video_name)]
             
             # Append results of predictions by Models
-            self.results_to_csv(self.extracted_results_face, "./results/extracted_face.csv", mode="a") 
-            self.results_to_csv(self.extracted_results_prosody, "./results/extracted_prosody.csv", mode="a")
+            if self.mode in ["video", "both"]:
+                self.results_to_csv(self.extracted_results_face, "./results/extracted_face.csv", mode="a") 
+            if self.mode in ["audio", "both"]:
+                self.results_to_csv(self.extracted_results_prosody, "./results/extracted_prosody.csv", mode="a")
             # # self.results_to_csv(self.extracted_results_vburst, "./results/extracted_vburst.csv", mode="a")
 
             # Append aggregated results
+            print("test man",self.aggregated_results)
             self.results_to_csv(self.aggregated_results, "./results/aggregated_emotions.csv", mode="a")
 
             self.extract_sequence(sequences=4) # Get last 4 predicted emotions for each prediction of emotions
             self.extract_utility() # Get utility for emotions
             self.extract_frequent_itemsets() # Get frequent itemsets for frequent itemset mining
-
-            return self.aggregated_results
+            self.print_results()
             
         except Exception as e:
             print("Error Detecting Emotions, trying again... ", e)
@@ -118,21 +130,26 @@ class HumeAPI:
 
     def results_to_csv(self, dataframe, file_path, mode='a'):
         '''Writes results to CSV file'''
-        # Check if the file already exists
+        # Check if the file already exists and is not empty
+        if os.path.exists(file_path) and os.stat(file_path).st_size > 0:
+            try:
+                # Determine whether to write headers based on the existing file
+                headers_exist = pd.notna(pd.read_csv(file_path, nrows=0).columns).any()
+
+            except pd.errors.EmptyDataError:
+                print("File is empty or has no headers")
+                headers_exist = False
+        else:
+            print("File does not exist or is empty. Writing with headers.")
+            headers_exist = False
+            
         try:
-            # Read the first row of the existing file
-            with open(file_path, 'r') as file:
-                file.readline().strip()
-
-            # Determine whether to write headers based on the existing file
-            headers_exist = pd.notna(pd.read_csv(file_path, nrows=0).columns).any()
-
-            # Write the DataFrame to the file without headers if they already exist
             dataframe.to_csv(file_path, mode=mode, header=not headers_exist, index=False)
-
-        except FileNotFoundError:
-            # If the file doesn't exist, write the DataFrame with headers
-            dataframe.to_csv(file_path, header=True, index=False)
+            print("Data written successfully.")
+        except Exception as e:
+            print(f"An error occurred while writing to the CSV file: {e}")
+            
+       
 
     def sort_results(self, results):
         '''Sorts emotions by name in ascending order'''
@@ -150,22 +167,24 @@ class HumeAPI:
         Collate emotions predictions from all model configs into a CSV
         '''
         # Extract Face predictions
-        try:
-            # Extract results from Hume API call
-            face_results = result["face"]["predictions"]
-            self.extracted_results_face = pd.json_normalize(face_results)
+        if self.mode == "video" or self.mode == "both":
+            try:
+                # Extract results from Hume API call
+                face_results = result["face"]["predictions"]
+                self.extracted_results_face = pd.json_normalize(face_results)
 
-        except KeyError:
-            print("No Faces Detected...")
-            self.extracted_results_face = pd.DataFrame()
+            except KeyError:
+                print("No Faces Detected...")
+                self.extracted_results_face = pd.DataFrame()
 
         # Extract Prosody predictions
-        try: 
-            prosody_results = result["prosody"]["predictions"]
-            self.extracted_results_prosody = pd.json_normalize(prosody_results)
-        except KeyError:
-            print("No Speech Prosody Detected...")
-            self.extracted_results_prosody = pd.DataFrame()
+        if self.mode == "audio" or self.mode == "both":
+            try: 
+                prosody_results = result["prosody"]["predictions"]
+                self.extracted_results_prosody = pd.json_normalize(prosody_results)
+            except KeyError:
+                print("No Speech Prosody Detected...")
+                self.extracted_results_prosody = pd.DataFrame()
         
         # Extract Vocal Burst predictions
         try:
@@ -207,20 +226,23 @@ class HumeAPI:
     def aggregate_emotions(self):
         '''Get average emotion scores for each processed interval across all configs'''
         # Face Config
-        try:
-            # Average prediction scores of emotions for the interval (Face)
-            averaged_emotions_face_dict = self.average_predictions(self.extracted_results_face["emotions"])
-        except KeyError:
-            print("No face predictions to aggregate") # No faces detected
-            averaged_emotions_face_dict = {}
+        averaged_emotions_face_dict, averaged_emotions_prosody_dict = None, None
+        if self.mode == "video" or self.mode == "both":
+            try:
+                # Average prediction scores of emotions for the interval (Face)
+                averaged_emotions_face_dict = self.average_predictions(self.extracted_results_face["emotions"])
+            except KeyError:
+                print("No face predictions to aggregate") # No faces detected
+                averaged_emotions_face_dict = {}
         
         # Prosody Config
-        try:
-            # Average prediction scores of emotions for the interval (Prosody)
-            averaged_emotions_prosody_dict = self.average_predictions(self.extracted_results_prosody["emotions"])
-        except KeyError:
-            print("No prosody predictions to aggregate") # No speech detected
-            averaged_emotions_prosody_dict = {}
+        if self.mode == "audio" or self.mode == "both":
+            try:
+                # Average prediction scores of emotions for the interval (Prosody)
+                averaged_emotions_prosody_dict = self.average_predictions(self.extracted_results_prosody["emotions"])
+            except KeyError:
+                print("No prosody predictions to aggregate") # No speech detected
+                averaged_emotions_prosody_dict = {}
 
         # Vocal Burst Config
         try:
@@ -236,11 +258,9 @@ class HumeAPI:
             # averaged_emotions_combined_dict = self.average_dicts(averaged_emotions_face_dict,averaged_emotions_prosody_dict,averaged_emotions_vburst_dict) # Uncomment when Vocal Burst implemented
             averaged_emotions_combined_dict = self.average_dicts(averaged_emotions_face_dict,averaged_emotions_prosody_dict) # Comment/Remove when vocal burst implemented
             occurring_emotions_dict = self.get_occurring_emotions(averaged_emotions_combined_dict)
-
             self.aggregated_results["occurring_emotions_dict"] = [occurring_emotions_dict]
             self.aggregated_results["occurring_emotions"] = [list(occurring_emotions_dict.keys())]
             self.aggregated_results["occurring_emotions_scores"] = [list(occurring_emotions_dict.values())]
-            print(self.aggregated_results)
             self.aggregated_results["occurring_emotions_encoded"] = self.aggregated_results.apply(lambda x: self.encode_emotions_list(x["occurring_emotions"]), axis=1)
             
         except Exception as e:
@@ -428,7 +448,6 @@ class HumeAPI:
         '''
         # Filter out empty dictionaries
         non_empty_dicts = [d for d in dicts if d]
-
         # Check if there are any non-empty dictionaries
         if len(non_empty_dicts) == 0:
             return None  # No non-empty dictionaries found

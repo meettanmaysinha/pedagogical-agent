@@ -11,7 +11,7 @@ if client.has_collection(collection_name="collection_demo"):
 
 client.create_collection(
     collection_name="collection_demo",
-    dimension=768,  # The vectors we will use in this demo has 768 dimensions
+    dimension=768,  
 )
 #embedding_fn = model.DefaultEmbeddingFunction()
 
@@ -23,6 +23,7 @@ embedding_fn =  model.dense.SentenceTransformerEmbeddingFunction(
 
 with open("docs/numpy.txt", "r", encoding="utf-8") as file:
     text = file.read()
+
 numpy_examples = [s for s in text.split('###') if s]
 first_lines = [s.split('\n',1)[0] for s in numpy_examples]
 

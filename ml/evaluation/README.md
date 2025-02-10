@@ -8,7 +8,8 @@ This foldercontains the necessary code to evaluate the DS-1000 dataset using our
 2. /result: Contains the evalution result for each model.
 3. run_inference.py: Contains the code to run inference on the DS-1000 dataset. Output will be stored in the /data folder
 4. test_ds1000.py: Evaluates model by executing testcases against the outputs in the /data folder. Results will be stored in /result
-5. QwenEvaluation.ipynb: A Jupyter Notebook providing an example of performing inference and evaluation on the model.
+5. qwen_evaluation_notebook.ipynb: A Jupyter Notebook providing an example of performing the DS-1000 evaluation on the model.
+6. qwen_rag_inference_notebook.ipynb: A Jupyter Notebook providing an example of performing the DS-1000 inference, with RAG on the model.
 
 
 ## Set up evaluatiob

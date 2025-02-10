@@ -4,6 +4,8 @@ import json
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_dataset
 from tqdm import tqdm
+from langchain.output_parsers import StructuredOutputParser, ResponseSchema
+import json
 
 import argparse
 
@@ -46,6 +48,16 @@ else:
         "pad_token": "<pad>"
     })
 
+response_schemas = [
+    ResponseSchema(name="hint", description="A hint to how the problem can be approached."),
+    ResponseSchema(name="code", description="The solution to the problem, in Python code."),
+    ResponseSchema(name="code_explanation", description="Explanation of how the code works.")
+]
+
+parser = StructuredOutputParser.from_response_schemas(response_schemas)
+format_instructions = parser.get_format_instructions()
+
+
 ds1000 = list(load_dataset("xlangai/DS-1000")["test"])
 prompts = [p["prompt"] for p in ds1000[cached_cnt:]]
 
@@ -54,6 +66,7 @@ prompts = [p["prompt"] for p in ds1000[cached_cnt:]]
 batch_size = 4
 print("batch size",batch_size) 
 print("model", model_name)
+
 # We set it to 8 since it is better for some hardware. More information here
 # https://github.com/huggingface/tokenizers/issues/991
 pad_to_multiple_of = 8
@@ -68,11 +81,12 @@ padding_side_default = tokenizer.padding_side
 tokenizer.padding_side = "left"
 # Tokenize each batch
 tokenized_prompts = []
+
 for formatted_prompt in formatted_prompts:
     messages = [
         [
             {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": f"{prompt}\n{format_instructions}"}
         ]
         for prompt in formatted_prompt
     ]
@@ -105,6 +119,7 @@ for batch in tqdm(tokenized_prompts):
             **generation_config
         )
     generated_text = tokenizer.batch_decode(outputs[:, prompt_len:], skip_special_tokens=True)
+    
     with open(f'data/{model_name}-answers.jsonl', 'a+') as f:
         for code in generated_text:
             stop_words = ["</code>", "# SOLUTION END"]
@@ -117,3 +132,40 @@ for batch in tqdm(tokenized_prompts):
             }
             f.write(json.dumps(r) + '\n')
             cached_cnt += 1
+    """
+    for text in generated_text:
+        try:
+            structured_response = parser.parse(text)
+            r = {
+                'id': cached_cnt,
+                'structured_response': structured_response,
+                'metadata': ds1000[cached_cnt]['metadata']
+            }
+
+            # Save the structured response in a file
+            with open(f'data/{model_name.replace("/", "-")}-answers.jsonl', 'a+') as f:
+                f.write(json.dumps(r) + '\n')
+
+            # Extract and save the code part separately
+            code = structured_response.get('code', None)
+            if code:
+                with open(f'data/{model_name.replace("/", "-")}-code-answers.jsonl', 'a+') as code_file:
+                    code_r = {
+                        'id': cached_cnt,
+                        'code': code,
+                    }
+                    code_file.write(json.dumps(code_r) + '\n')
+
+            cached_cnt += 1
+
+        except Exception as e:
+            print(f"Error parsing response: {e}")
+            r = {
+                'id': cached_cnt,
+                'raw_response': text,
+                'metadata': ds1000[cached_cnt]['metadata']
+            }
+            with open(f'data/{model_name.replace("/", "-")}-answers.jsonl', 'a+') as f:
+                f.write(json.dumps(r) + '\n')
+            cached_cnt += 1
+    """

@@ -35,4 +35,7 @@ Milvus was chosen primarily due to:
 4. Offers built-in support for numerous similarity metrics and indexing methods
 
 ### Embedding Model 
+CornRank Embed (https://huggingface.co/cornstack/CodeRankEmbed) was chosen primarily due to:
+1. Strong performance on several code information retrieval metrics (CodeSearchNet and CoIR benchmarks)
+2. Relatively small parameter size, which results in faster processing compared to similar code embedding models
 

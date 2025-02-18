@@ -2,13 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
+import json
 import os
 import pandas as pd
-import subprocess
 import ast
 import csv
 import configparser
-
+from ml.rag.rag_helper import ip_search
+from pymilvus import MilvusClient, model
 
 
 # Load the environment variables
@@ -28,11 +29,21 @@ config = configparser.ConfigParser()
 # Read the configuration file for prompts
 config.read("./agent_prompts/config.ini")
 
+
+milvus_client = MilvusClient(uri="http://localhost:19530")
+embedding_fn =  model.dense.SentenceTransformerEmbeddingFunction(
+    model_name='cornstack/CodeRankEmbed',
+    device='cpu',
+    trust_remote_code=True  
+)
+
 # Access agent conversation prompts
 prompts = "agentprompts"
 initial_agent_prompt = config[prompts]["initial_agent_prompt"]
 student_prompt = config[prompts]["student_prompt"]
 FEW_SHOT_PATH = "./agent_prompts/prompt_examples.csv"
+
+
 
 emotion_map = {
 'Anxious': 	'A student is feeling anxious about an upcoming exam.	"1. **Acknowledge the feeling:** \I understand that exams can be really stressful. It is normal to feel anxious.\""\n2. **Offer reassurance:** \""Remember, you have been preparing for this. Trust in your preparation.\""\n3. **Provide practical advice:** \""Would you like some tips on how to manage your study time or practice some relaxation techniques?\""\n4. **Encourage:** \""You got this! Take one step at a time and focus on doing your best.\""',
@@ -72,19 +83,20 @@ def run_agent_api():
 
 # Define the API endpoint for the chat response
 
-def generate_prompt(question, code_examples, prompt_file="prompt.md"):
+def generate_prompt(question, user_emotions, prompt_file="prompt.md"):
     """
     Function generates prompt from question and prompt_file
     """
     with open(prompt_file, "r", encoding="utf-8") as file:
         prompt = file.read()
-
-    user_emotions = ast.literal_eval(get_emotions())
-    print(type(user_emotions), len(user_emotions), user_emotions)
+    user_emotions = ast.literal_eval(user_emotions)
     emotional_response_map_str = ""
     for emotion in user_emotions:
         emotional_response_map_str += emotion_map[emotion]
-
+    code_examples_ls = ip_search([question],["text"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
+    code_examples=""
+    for i,code_ex in enumerate(code_examples_ls):
+        code_examples += f"Example {i+1}:\n {code_ex} \n\n"
     prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str)
     return prompt
 
@@ -117,11 +129,12 @@ def api_get_chat_response():
     if request.method == 'POST':
         data = request.json 
         message_content = data.get('message_content')
-        emotions = get_emotions()
         if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
-        response = get_chat_response(message_content, emotions)
-        print(response)
+        emotions = get_emotions()
+        prompt = generate_prompt(question=message_content,prompt_file='/Users/nickyloo/projects/ra_job/pedagogical-agent/packages/pipeline/prompt.md', user_emotions=emotions)
+        print("PROMPT",prompt)
+        response = get_chat_response(prompt, emotions)
         return jsonify({"response": response}), 200
 
 def read_examples_from_csv(file_path):
@@ -141,7 +154,7 @@ def get_chat_response(message_content, emotions):
     
     append_message_history("user", message_content, emotions)
     
-    client = OpenAI(base_url=TEXT_TO_CODE_API_URL + "/v1/", api_key=HF_TOKEN)
+    client = OpenAI(base_url=TEXT_TO_CODE_API_URL, api_key=HF_TOKEN)
 
     chat_completion = client.chat.completions.create(
         model="tgi",

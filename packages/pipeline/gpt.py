@@ -1,13 +1,14 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from openai import OpenAI
-from dotenv import load_dotenv
 import json
 import os
 import pandas as pd
 import ast
 import csv
 import configparser
+from pathlib import Path
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from openai import OpenAI
+from dotenv import load_dotenv
 from ml.rag.rag_helper import ip_search
 from pymilvus import MilvusClient, model
 
@@ -44,34 +45,12 @@ student_prompt = config[prompts]["student_prompt"]
 FEW_SHOT_PATH = "./agent_prompts/prompt_examples.csv"
 
 
-
-emotion_map = {
-'Anxious': 	'A student is feeling anxious about an upcoming exam.	"1. **Acknowledge the feeling:** \I understand that exams can be really stressful. It is normal to feel anxious.\""\n2. **Offer reassurance:** \""Remember, you have been preparing for this. Trust in your preparation.\""\n3. **Provide practical advice:** \""Would you like some tips on how to manage your study time or practice some relaxation techniques?\""\n4. **Encourage:** \""You got this! Take one step at a time and focus on doing your best.\""',
-
-'Excited':	'A student is excitedly sharing news about winning a science fair.	"1. **Acknowledge the excitement:** \""That is amazing! Congratulations on winning the science fair!\""\n2. **Encourage sharing:** \""Can you tell me more about your project? I would love to hear all the details.\""\n3. **Reinforce positive feelings:** \""It is clear you put a lot of hard work into this, and it paid off. Great job!\""\n4. **Channel the energy:** \""Maybe you can inspire your classmates by sharing your experience and what you learned from it.\"""',
-
-'Angry':	'A student is angry after receiving a lower grade than expected on an assignment.	"1. **Acknowledge the anger:** \""I can see you are upset about your grade. It is okay to feel that way.\""\n2. **Encourage expression:** \""Would you like to talk about what specifically is bothering you about the grade?\""\n3. **Provide constructive advice:** \""Lets review your assignment together and see where there might be areas for improvement.\""\n4. **Support positive action:** \""Remember, one grade doesnt define your abilities. Use this as a learning opportunity to do even better next time.\"""',
-
-'Sad':	'A student is feeling sad due to a recent personal issue.	"1. **Show empathy:** \""I am sorry to hear that you are feeling sad. It is important to take care of yourself.\""\n2. **Offer support:** \""Would you like some suggestions on how to cope with these feelings, or do you just need someone to listen?\""\n3. **Provide resources:** \""Here are some resources that might help you manage your emotions. Remember, it is okay to reach out for help.\""\n4. **Encourage self-care:** \""Make sure to take some time for yourself and do things that make you feel better.\"""',
-
-'Frustrated':	'A student is frustrated with a difficult homework problem.	"1. **Acknowledge the frustration:** \""It sounds like this problem is really challenging. That is completely understandable.\""\n2. **Offer reassurance:** \""It is okay to feel frustrated. Difficult problems can often be the most rewarding to solve.\""\n3. **Provide step-by-step help:** \""Lets break down the problem together and tackle it one step at a time. Where do you think you are getting stuck?\""\n4. **Encourage persistence:** \""You are doing great by not giving up. Keep trying, and lets see how we can solve this together.\"""',
-
-'Confused':	'A student is confused about the instructions for a project.	"1. **Acknowledge the confusion:** \""I can see how these instructions might be confusing.\""\n2. **Clarify the instructions:** \""Lets go through the instructions together. Here is what each part means.\""\n3. **Provide examples:** \""Would you like to see an example of a completed project to help understand better?\""\n4. **Encourage questions:** \""Feel free to ask any questions you have. I am here to help you understand.\"""',
-
-'Bored':	'A student is expressing boredom with the current lesson.	"1. **Acknowledge the feeling:** \""I understand that you might find this lesson a bit boring.\""\n2. **Engage interest:** \""What part of the subject do you find most interesting? Maybe we can focus on that.\""\n3. **Offer alternatives:** \""Would you like to try a different approach or activity related to this topic?\""\n4. **Encourage exploration:** \""Sometimes exploring the topic in a different way can make it more exciting. Lets find a way that works for you.\"""',
-
-'Curious':	'A student is curious about a topic not covered in the curriculum.	"1. **Encourage curiosity:** \""It is great that you are curious about this topic!\""\n2. **Provide information:** \""Here is some information to get you started on this topic.\""\n3. **Suggest further exploration:** \""Would you like some recommendations for books, articles, or videos on this subject?\""\n4. **Support learning:** \""Feel free to ask more questions as you explore. I am here to help you learn more about anything you are interested in.\"""',
-
-'Disappointed':	'A student is disappointed after not making the school sports team.	"1. **Acknowledge the disappointment:** \""Its completely normal to feel disappointed about not making the team.\""\n2. **Provide empathy:** \""I amm sorry to hear that. You worked hard, and it is tough when things dont go as planned.\""\n3. **Encourage resilience:** \""Remember, this is just one setback. There are many other opportunities to come.\""\n4. **Suggest alternatives:** \""Maybe you can try out for another team or focus on improving your skills for next time.\""',
-
-'Motivated':	'A student is highly motivated and eager to learn more about a subject.	"1. **Recognize the motivation:** \""Its fantastic to see you so motivated and eager to learn!\""\n2. **Provide resources:** \""Here are some advanced materials and resources you can explore.\""\n3. **Encourage deeper learning:** \""Would you like to work on a special project related to this subject?\""\n4. **Support continued interest:** \""Keep up the great work! Your enthusiasm is inspiring.\""',
-
-'Concentration':	'A student is currently concentrated in their work.	Allow student to continue working on their own.',
-
-'Amusement': 'A student is amused by the work. Encourage their passion by quizzing them.',
-'Interest': 'A student is amused by the work. Encourage their interest by recommeding them extra content.',
-}
-
+emotion_map = {}
+package_dir = Path(__file__).parent  # This gets the directory of the current script
+json_path = package_dir / "emotion_map.json"
+with open(json_path, "r") as f:
+    emotion_map = json.load(f)
+    
 # Initialise Flask
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -132,8 +111,7 @@ def api_get_chat_response():
         if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
         emotions = get_emotions()
-        prompt = generate_prompt(question=message_content,prompt_file='/Users/nickyloo/projects/ra_job/pedagogical-agent/packages/pipeline/prompt.md', user_emotions=emotions)
-        print("PROMPT",prompt)
+        prompt = generate_prompt(question=message_content,prompt_file=package_dir / 'prompt.md', user_emotions=emotions)
         response = get_chat_response(prompt, emotions)
         return jsonify({"response": response}), 200
 

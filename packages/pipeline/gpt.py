@@ -1,18 +1,23 @@
+import json
+import os
+import pandas as pd
+import ast
+import csv
+import configparser
+from pathlib import Path
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
-import os
-import pandas as pd
-import subprocess
-import json
-import csv
-import configparser
-
+from ml.rag.rag_helper import ip_search
+from pymilvus import MilvusClient, model
 
 
 # Load the environment variables
 load_dotenv()
+
+TEXT_TO_CODE_API_URL=os.getenv("TEXT_TO_CODE_API_URL")
+HF_TOKEN=os.getenv("HF_TOKEN")
 
 # Initialise the OpenAI API
 openai = OpenAI(
@@ -25,21 +30,56 @@ config = configparser.ConfigParser()
 # Read the configuration file for prompts
 config.read("./agent_prompts/config.ini")
 
+
+milvus_client = MilvusClient(uri="http://localhost:19530")
+embedding_fn =  model.dense.SentenceTransformerEmbeddingFunction(
+    model_name='cornstack/CodeRankEmbed',
+    device='cpu',
+    trust_remote_code=True  
+)
+
 # Access agent conversation prompts
 prompts = "agentprompts"
 initial_agent_prompt = config[prompts]["initial_agent_prompt"]
 student_prompt = config[prompts]["student_prompt"]
 FEW_SHOT_PATH = "./agent_prompts/prompt_examples.csv"
 
-# Function to start Flask for the Agent API endpoint
-def run_agent_api():
-    subprocess.Popen("python packages/pipeline/gpt.py", shell=True)
 
+emotion_map = {}
+package_dir = Path(__file__).parent  # This gets the directory of the current script
+json_path = package_dir / "emotion_map.json"
+with open(json_path, "r") as f:
+    emotion_map = json.load(f)
+    
 # Initialise Flask
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+# Function to start Flask for the Agent API endpoint
+def run_agent_api():
+    #subprocess.Popen("python packages/pipeline/gpt.py", shell=True)
+    app.run(host="0.0.0.0",port=8000, debug=True)
+
 # Define the API endpoint for the chat response
+
+def generate_prompt(question, user_emotions, prompt_file="prompt.md"):
+    """
+    Function generates prompt from question and prompt_file
+    """
+    with open(prompt_file, "r", encoding="utf-8") as file:
+        prompt = file.read()
+    user_emotions = ast.literal_eval(user_emotions)
+    emotional_response_map_str = ""
+    for emotion in user_emotions:
+        emotional_response_map_str += emotion_map[emotion]
+    code_examples_ls = ip_search([question],["text"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
+    code_examples=""
+    for i,code_ex in enumerate(code_examples_ls):
+        code_examples += f"Example {i+1}:\n {code_ex} \n\n"
+    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str)
+    return prompt
+
+
 @app.route('/api/chat', methods=['POST'])
 def api_get_chat_response():
     """
@@ -66,17 +106,13 @@ def api_get_chat_response():
     If any required parameters are missing, it returns a JSON response with an error message.
     """
     if request.method == 'POST':
-        print("test",request.method)
-        data = request.json  # Assuming the data is sent in JSON format
+        data = request.json 
         message_content = data.get('message_content')
-        emotions = get_emotions()
-        print(message_content)
-        print(emotions)
         if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
-
-        response = get_chat_response(message_content, emotions)
-
+        emotions = get_emotions()
+        prompt = generate_prompt(question=message_content,prompt_file=package_dir / 'prompt.md', user_emotions=emotions)
+        response = get_chat_response(prompt, emotions)
         return jsonify({"response": response}), 200
 
 def read_examples_from_csv(file_path):
@@ -90,19 +126,33 @@ def read_examples_from_csv(file_path):
             examples.append(row)
     return examples
 
+
 def get_chat_response(message_content, emotions):
     # Save User's message into chat history
+    
     append_message_history("user", message_content, emotions)
+    
+    client = OpenAI(base_url=TEXT_TO_CODE_API_URL, api_key=HF_TOKEN)
 
-    completion = openai.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=get_message_history(),
+    chat_completion = client.chat.completions.create(
+        model="tgi",
+        messages=[
+            {"role": "system", "content": "You are Qwen, an expert in data science designed to help users with their data science related coding questions."},
+            {"role": "user", "content": message_content},
+        ],
+        top_p=None,
+        temperature=None,
+        max_tokens=150,
+        stream=False,
+        seed=None,
+        frequency_penalty=None,
+        presence_penalty=None,
     )
 
     # Save Agents' response into chat history
-    append_message_history("assistant", completion.choices[0].message.content, None)
+    append_message_history("assistant", chat_completion.choices[0].message.content, None)
 
-    return completion.choices[0].message.content
+    return chat_completion.choices[0].message.content
 
 def get_emotions():
     """

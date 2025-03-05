@@ -20,6 +20,7 @@ packages/DUMP/AVRecorder.py
 recordings/av_output/av_timestamps.json
 message_history.json
 /env
+/ml/evaluation/result/trial_*
 
 # Do not ignore
 !prompt_examples.csv

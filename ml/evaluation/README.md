@@ -113,3 +113,12 @@ This project makes use of the evaluation metric implementation by Lai, Yuhang an
 | Origin            | 452   | 0.531 |
 | Semantic          | 234   | 0.423 |
 | Surface           | 152   | 0.296 |
+
+## March 14, 2025
+
+- created a new notebook 'qwen_rag_inference_notebook_userprompts.ipynb' to test LLM generation for non-ds1000 prompts
+  - The queries are now in JSON format to simulate passing in queries from the jupyter lab frontend
+  - Queries have the following attributes:
+    - message_content - the question body
+    - error_info - metadata relating the question, including the error type (e.g. runtime error, segmentation error) and the number of times the user has encountered this error
+  - TODO: write the prompts based on the error count passed in through the json file

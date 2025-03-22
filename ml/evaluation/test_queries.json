@@ -1,0 +1,37 @@
+[
+  {
+    "payload": {
+      "message_content": "import pandas as pd\nimport numpy as np\n\nnp.random.seed(42)\ndata = np.random.randn(100, 4)\n# How do I convert this to a DataFrame with columns 'A', 'B', 'C', 'D'?",
+      "error_info": "No error log available",
+      "help_level": "default"
+    }
+  },
+  {
+    "payload": {
+      "message_content": "import matplotlib.pyplot as plt\n\nx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\ny = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]\n\n# Need to create a scatter plot with color based on x-value and add a colorbar",
+      "error_info": "ModuleNotFoundError: No module named 'matplotlib'",
+      "help_level": "hint"
+    }
+  },
+  {
+    "payload": {
+      "message_content": "scores = {\n    'Math': [85, 90, 92, 88, 95],\n    'Science': [92, 88, 94, 90, 91],\n    'History': [75, 85, 80, 88, 82],\n    'English': [88, 84, 90, 92, 86]\n}\n\ndf = pd.DataFrame(scores)\nstudent_ids = ['S001', 'S002', 'S003', 'S004', 'S005']\ndf.index = students\n\nbest_subject = df.mean().idxmax()\nprint(f\"Best subject: {best_subject}\")\n\nhigh_achievers = []\nfor student in student_ids:\n    high_scores = sum(df.loc[student] > 90)\n    if high_scores >= 2:\n        high_achievers.append(student)\n\nprint(f\"High achievers: {high_achievers}\")",
+      "error_info": "NameError: name 'students' is not defined",
+      "help_level": "guided"
+    }
+  },
+  {
+    "payload": {
+      "message_content": "from sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.naive_bayes import MultinomialNB\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.metrics import accuracy_score\n\ntexts = [\n    \"This movie was fantastic and I loved it\",\n    \"The acting was terrible and the plot made no sense\",\n    \"Great film with amazing special effects\",\n    \"I hated this show and wouldn't recommend it\",\n    \"The characters were well developed and the story was engaging\"\n]\n\nlabels = [1, 0, 1, 0, 1]\n\npipeline = Pipeline([\n    ('tfidf', TfidfVectorizer(),\n    ('classifier', MultinomialNB())\n])\n\npipeline.fit(texts, labels)\n\nnew_texts = [\"I didn't enjoy this movie\", \"The directing was excellent\"]\npredictions = pipeline.predict(new_texts)\nprint(predictions)",
+      "error_info": "SyntaxError: invalid syntax",
+      "help_level": "comprehensive"
+    }
+  },
+  {
+    "payload": {
+      "message_content": "import pandas as pd\nimport numpy as np\nimport yfinance as yf\n\ndef analyze_stock_volatility(ticker, start_date, end_date, window=20):\n    stock_data = yf.download(ticker, start=start_date, end=end_date)\n    stock_data['Daily_Return'] = stock_data['Adj Close'].pct_change()\n    stock_data['Volatility'] = stock_data['Daily_Return'].rolling(window=window).std() * np.sqrt(252)\n    stock_data['Avg_Volume'] = stock_data['Volume'].rolling(window=window).mean()\n    mean_vol = stock_data['Volatility'].mean()\n    std_vol = stock_data['Volatility'].std()\n    stock_data['High_Volatility'] = stock_data['Volatility'] > (mean_vol + 2 * std_vol)\n    return stock_data\n\nresults = analyze_stock_volatility('AAPL', '2022-01-01', '2023-01-01')\n\nimport matplotlib.pyplot as plt\n\nplt.figure(figsize=(14, 7))\nplt.plot(results['Volatility'])\nplt.title('AAPL Volatility (Annualized)')\nplt.ylabel('Volatility')\nplt.axhline(y=results['Volatility'].mean(), color='r', linestyle='--', label='Mean')\nplt.legend()\nplt.show()",
+      "error_info": "ModuleNotFoundError: No module named 'yfinance'",
+      "help_level": "guided"
+    }
+  }
+]

@@ -72,7 +72,7 @@ def generate_prompt(question, user_emotions, prompt_file="prompt.md"):
     emotional_response_map_str = ""
     for emotion in user_emotions:
         emotional_response_map_str += emotion_map[emotion]
-    code_examples_ls = ip_search([question],["text"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
+    code_examples_ls = ip_search([question],["text", "metadata"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
     code_examples=""
     for i,code_ex in enumerate(code_examples_ls):
         code_examples += f"Example {i+1}:\n {code_ex} \n\n"

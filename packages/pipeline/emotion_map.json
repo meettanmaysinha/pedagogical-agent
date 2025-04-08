@@ -19,5 +19,9 @@
     },
     "Concentration": "A student is currently concentrated in their work. Allow student to continue working on their own.",
     "Amusement": "A student is amused by the work. Encourage their passion by quizzing them.",
-    "Interest": "A student is amused by the work. Encourage their interest by recommending them extra content."
+    "Interest": "A student is interested in the work. Encourage their interest by recommending them extra content.",
+    "Joy": "Student is enjoying the work. Encourage their interest by recommending them extra content.",
+    "Sadness" :"Student is sad. Please encourage them",
+    "Boredom": "Student is bored. Make them excited.",
+    "Calmness": "student is calm."
 }

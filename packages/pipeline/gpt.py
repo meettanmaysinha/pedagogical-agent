@@ -58,7 +58,7 @@ CORS(app)  # Enable CORS for all routes
 # Function to start Flask for the Agent API endpoint
 def run_agent_api():
     #subprocess.Popen("python packages/pipeline/gpt.py", shell=True)
-    app.run(host="0.0.0.0",port=8000, debug=True)
+    app.run(host="0.0.0.0",port=8000,  debug=False, use_reloader=False)
 
 # Define the API endpoint for the chat response
 
@@ -129,11 +129,8 @@ def read_examples_from_csv(file_path):
 
 def get_chat_response(message_content, emotions):
     # Save User's message into chat history
-    
     append_message_history("user", message_content, emotions)
-    
     client = OpenAI(base_url=TEXT_TO_CODE_API_URL, api_key=HF_TOKEN)
-
     chat_completion = client.chat.completions.create(
         model="tgi",
         messages=[
@@ -247,11 +244,11 @@ def agent_stage(stage_number):
 
 
 
-if __name__ == '__main__':
-    port = 8000 # Default port set to 8000
-    try:
-        app.run(port=port, debug=True)
-    except OSError as e:
-        print("Port is already in use, please kill the process and try again.")
-        print("You can kill the process using the following command in the terminal:")
-        print("npx kill-port 8000")
+# if __name__ == '__main__':
+#     port = 8000 # Default port set to 8000
+#     try:
+#         app.run(port=port, debug=True)
+#     except OSError as e:
+#         print("Port is already in use, please kill the process and try again.")
+#         print("You can kill the process using the following command in the terminal:")
+#         print("npx kill-port 8000")

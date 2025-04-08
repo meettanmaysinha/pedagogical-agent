@@ -7,6 +7,7 @@ from packages.emotionpattern.PatternMine import PatternMine
 import time
 from dotenv import load_dotenv
 import os
+import threading
 
 load_dotenv()
 API_KEY = os.getenv("HUME_API_KEY")
@@ -39,11 +40,14 @@ def main():
         Confidence score allowance for emotions to be co-occurring (default = 0.05)
     ''' 
     args = parse_arguments()
-    # Run Flask app for Agent API
-    run_agent_api()
-    
+    # run_agent_api()
+    api_thread = threading.Thread(target=run_agent_api)
+    api_thread.daemon = True  
+    api_thread.start()
     # Video recording and Hume predictions
     video_processor = VideoProcessor(API_KEY, interval=5, recording_folder="recordings", confidence_allowance = 0.05, mode = args.mode)
+
+
     
     # Pattern Mining Algorithms
     seq_pattern_mine = PatternMine("PrefixSpan") # Prefix Span algorithm for Sequential Pattern Mining

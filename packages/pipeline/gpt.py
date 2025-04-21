@@ -115,7 +115,7 @@ def api_get_chat_response():
         data = request.json 
         message_content = data.get('message_content')
         help_level = data.get('help_level')
-        print(f'Help level: {help_level}')
+        # print(f'Help level: {help_level}')
         if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
         emotions = get_emotions()
@@ -138,9 +138,9 @@ def read_examples_from_csv(file_path):
 def get_chat_response(message_content, emotions):
     # Save User's message into chat history
     append_message_history("user", message_content, emotions)
-    print("USER QUERY ----------------------------------------------------------------")
-    print(message_content)
-    print("---------------------------------------------------------------------------")
+    # print("USER QUERY ----------------------------------------------------------------")
+    # print(message_content)
+    # print("---------------------------------------------------------------------------")
     client = OpenAI(base_url=TEXT_TO_CODE_API_URL, api_key=HF_TOKEN)
     chat_completion = client.chat.completions.create(
         model="tgi",

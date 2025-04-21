@@ -51,6 +51,12 @@ json_path = package_dir / "emotion_map.json"
 with open(json_path, "r") as f:
     emotion_map = json.load(f)
     
+help_level_map = {}
+package_dir = Path(__file__).parent  # This gets the directory of the current script
+json_path = package_dir / "help_level_map.json"
+with open(json_path, "r") as f:
+    help_level_map = json.load(f)
+    
 # Initialise Flask
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -62,7 +68,7 @@ def run_agent_api():
 
 # Define the API endpoint for the chat response
 
-def generate_prompt(question, user_emotions, prompt_file="prompt.md"):
+def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"):
     """
     Function generates prompt from question and prompt_file
     """
@@ -76,7 +82,7 @@ def generate_prompt(question, user_emotions, prompt_file="prompt.md"):
     code_examples=""
     for i,code_ex in enumerate(code_examples_ls):
         code_examples += f"Example {i+1}:\n {code_ex} \n\n"
-    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str)
+    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level])
     return prompt
 
 
@@ -108,10 +114,12 @@ def api_get_chat_response():
     if request.method == 'POST':
         data = request.json 
         message_content = data.get('message_content')
+        help_level = data.get('help_level')
+        print(f'Help level: {help_level}')
         if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
         emotions = get_emotions()
-        prompt = generate_prompt(question=message_content,prompt_file=package_dir / 'prompt.md', user_emotions=emotions)
+        prompt = generate_prompt(question=message_content,prompt_file=package_dir / 'prompt.md', user_emotions=emotions, help_level=help_level)
         response = get_chat_response(prompt, emotions)
         return jsonify({"response": response}), 200
 
@@ -130,6 +138,9 @@ def read_examples_from_csv(file_path):
 def get_chat_response(message_content, emotions):
     # Save User's message into chat history
     append_message_history("user", message_content, emotions)
+    print("USER QUERY ----------------------------------------------------------------")
+    print(message_content)
+    print("---------------------------------------------------------------------------")
     client = OpenAI(base_url=TEXT_TO_CODE_API_URL, api_key=HF_TOKEN)
     chat_completion = client.chat.completions.create(
         model="tgi",

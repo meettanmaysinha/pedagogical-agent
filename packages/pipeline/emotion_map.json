@@ -1,27 +1,71 @@
 {
-    "Anxious": {
-        "description": "A student is feeling anxious about an upcoming exam.",
-        "responses": [
-            "**Acknowledge the feeling:** 'I understand that exams can be really stressful. It is normal to feel anxious.'",
-            "**Offer reassurance:** 'Remember, you have been preparing for this. Trust in your preparation.'",
-            "**Provide practical advice:** 'Would you like some tips on how to manage your study time or practice some relaxation techniques?'",
-            "**Encourage:** 'You got this! Take one step at a time and focus on doing your best.'"
-        ]
-    },
-    "Excited": {
-        "description": "A student is excitedly sharing news about winning a science fair.",
-        "responses": [
-            "**Acknowledge the excitement:** 'That is amazing! Congratulations on winning the science fair!'",
-            "**Encourage sharing:** 'Can you tell me more about your project? I would love to hear all the details.'",
-            "**Reinforce positive feelings:** 'It is clear you put a lot of hard work into this, and it paid off. Great job!'",
-            "**Channel the energy:** 'Maybe you can inspire your classmates by sharing your experience and what you learned from it.'"
-        ]
-    },
-    "Concentration": "A student is currently concentrated in their work. Allow student to continue working on their own.",
-    "Amusement": "A student is amused by the work. Encourage their passion by quizzing them.",
-    "Interest": "A student is interested in the work. Encourage their interest by recommending them extra content.",
-    "Joy": "Student is enjoying the work. Encourage their interest by recommending them extra content.",
-    "Sadness" :"Student is sad. Please encourage them",
-    "Boredom": "Student is bored. Make them excited.",
-    "Calmness": "student is calm."
+  "Anxiety": {
+    "description": "A student is feeling anxious about an upcoming exam.",
+    "responses": [
+      "**Acknowledge the feeling:** 'I understand that exams can be really stressful. It is normal to feel anxious.'",
+      "**Offer reassurance:** 'Remember, you have been preparing for this. Trust in your preparation.'",
+      "**Provide practical advice:** 'Would you like some tips on how to manage your study time or practice some relaxation techniques?'",
+      "**Encourage:** 'You got this! Take one step at a time and focus on doing your best.'"
+    ]
+  },
+  "Excitement": {
+    "description": "A student is excitedly sharing news about winning a science fair.",
+    "responses": [
+      "**Acknowledge the excitement:** 'That is amazing! Congratulations on winning the science fair!'",
+      "**Encourage sharing:** 'Can you tell me more about your project? I would love to hear all the details.'",
+      "**Reinforce positive feelings:** 'It is clear you put a lot of hard work into this, and it paid off. Great job!'",
+      "**Channel the energy:** 'Maybe you can inspire your classmates by sharing your experience and what you learned from it.'"
+    ]
+  },
+  "Concentration": "A student is currently concentrated in their work. Allow student to continue working on their own.",
+  "Amusement": "A student is amused by the work. Encourage their passion by quizzing them.",
+  "Interest": "A student is interested in the work. Encourage their interest by recommending them extra content.",
+  "Joy": "Student is enjoying the work. Encourage their interest by recommending them extra content.",
+  "Sadness": "Student is sad. Please encourage them",
+  "Boredom": "Student is bored. Make them excited.",
+  "Calmness": "student is calm.",
+  "Admiration": "",
+  "Adoration": "",
+  "Aesthetic Appreciation": "",
+  "Anger": "",
+  "Annoyance": "",
+  "Awe": "",
+  "Awkwardness": "",
+  "Confusion": "",
+  "Contemplation": "",
+  "Contempt": "",
+  "Contentment": "",
+  "Craving": "",
+  "Desire": "",
+  "Determination": "",
+  "Disappointment": "",
+  "Disapproval": "",
+  "Disgust": "",
+  "Distress": "",
+  "Doubt": "",
+  "Ecstasy": "",
+  "Embarrassment": "",
+  "Empathic Pain": "",
+  "Enthusiasm": "",
+  "Entrancement": "",
+  "Envy": "",
+  "Fear": "",
+  "Gratitude": "",
+  "Guilt": "",
+  "Horror": "",
+  "Love": "",
+  "Nostalgia": "",
+  "Pain": "",
+  "Pride": "",
+  "Realization": "",
+  "Relief": "",
+  "Romance": "",
+  "Sarcasm": "",
+  "Satisfaction": "",
+  "Shame": "",
+  "Surprise (negative)": "",
+  "Surprise (positive)": "",
+  "Sympathy": "",
+  "Tiredness": "",
+  "Triumph": ""
 }

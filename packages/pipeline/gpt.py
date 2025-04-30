@@ -74,15 +74,39 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     """
     with open(prompt_file, "r", encoding="utf-8") as file:
         prompt = file.read()
+        
     user_emotions = ast.literal_eval(user_emotions)
     emotional_response_map_str = ""
+    
     for emotion in user_emotions:
-        emotional_response_map_str += emotion_map[emotion]
+        emotional_response_map_str += emotion_map[emotion]["response"]
+        
     code_examples_ls = ip_search([question],["text", "metadata"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
     code_examples=""
+    
     for i,code_ex in enumerate(code_examples_ls):
         code_examples += f"Example {i+1}:\n {code_ex} \n\n"
-    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level])
+    
+    # Read the past 3 queries
+    try:
+        with open("./agent_prompts/query_history.json", "r") as file:
+            query_history = json.load(file)
+            past_queries = query_history[-3:]  # Get the last 3 queries
+    except (FileNotFoundError, json.JSONDecodeError):
+        past_queries = []
+
+    # Format past queries nicely with both question and answer (oldest first)
+    if past_queries:
+        past_queries_str = "\n\n".join(
+            f"{idx+1}. question:\n    {q['question']}\n   answer:\n    {q['answer']}"
+            for idx, q in enumerate(past_queries)
+        )
+    else:
+        past_queries_str = "No past queries available."
+
+
+        
+    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level], past_queries=past_queries_str)
     return prompt
 
 
@@ -120,6 +144,7 @@ def api_get_chat_response():
             return jsonify({"error": "Missing required parameters"}), 400
         emotions = get_emotions()
         prompt = generate_prompt(question=message_content,prompt_file=package_dir / 'prompt.md', user_emotions=emotions, help_level=help_level)
+        append_query_history('query', message_content)
         response = get_chat_response(prompt, emotions)
         return jsonify({"response": response}), 200
 
@@ -150,7 +175,7 @@ def get_chat_response(message_content, emotions):
         ],
         top_p=None,
         temperature=None,
-        max_tokens=150,
+        max_tokens=300,
         stream=False,
         seed=None,
         frequency_penalty=None,
@@ -159,6 +184,8 @@ def get_chat_response(message_content, emotions):
 
     # Save Agents' response into chat history
     append_message_history("assistant", chat_completion.choices[0].message.content, None)
+    
+    append_query_history('response', chat_completion.choices[0].message.content)
 
     return chat_completion.choices[0].message.content
 
@@ -230,6 +257,43 @@ def append_message_history(role, message_content, emotions):
     with open("./agent_prompts/message_history.json", "w") as file:
         json.dump(message_history, file, indent=4)  # indent=4 for pretty formatting
     
+# This function is used to implement a memory mechanism for the agent
+# When modifying the user prompt, it will add the last 3 queries + agent's response to the prompt
+# Why use a separate function when there is the append_message_history function?
+# That function appends the query that is ALREADY MODIFIED (with all the RAG, emotional response etc), and this function appends the RAW query 
+def append_query_history(message_type, content):
+    """
+    Appends a query or response to the query history JSON file.
+    If message_type is 'query', it adds a dict with the question and an empty answer.
+    If message_type is 'response', it appends the content to the latest query's answer.
+    """
+    file_path = "./agent_prompts/query_history.json"
+    
+    # Load existing history or initialize empty list
+    if not os.path.exists(file_path):
+        query_history = []
+    else:
+        with open(file_path, "r") as file:
+            query_history = json.load(file)
+
+    if message_type == "query":
+        query_history.append({
+            "question": content,
+            "answer": ""
+        })
+    elif message_type == "response":
+        if not query_history:
+            raise ValueError("Cannot append response: query history is empty.")
+        query_history[-1]["answer"] = content
+    else:
+        raise ValueError(f"Invalid message_type '{message_type}'. Use 'query' or 'response'.")
+
+    # Save updated history
+    with open(file_path, "w") as file:
+        json.dump(query_history, file, indent=4)
+
+
+
 def agent_stage(stage_number):
     """
     Changes the prompt for the Agent based on student's problem solving stage

@@ -74,15 +74,34 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     """
     with open(prompt_file, "r", encoding="utf-8") as file:
         prompt = file.read()
+        
     user_emotions = ast.literal_eval(user_emotions)
     emotional_response_map_str = ""
+    
     for emotion in user_emotions:
         emotional_response_map_str += emotion_map[emotion]
+        
     code_examples_ls = ip_search([question],["text", "metadata"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
     code_examples=""
+    
     for i,code_ex in enumerate(code_examples_ls):
         code_examples += f"Example {i+1}:\n {code_ex} \n\n"
-    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level])
+    
+    # Read the past 3 queries
+    try:
+        with open("./agent_prompts/query_history.json", "r") as file:
+            query_history = json.load(file)
+            past_queries = query_history[-3:]  # Get the last 3 queries
+    except (FileNotFoundError, json.JSONDecodeError):
+        past_queries = []
+
+    # Format past queries nicely
+    if past_queries:
+        past_queries_str = "\n".join(f"{idx+1}. {query}" for idx, query in enumerate(past_queries))
+    else:
+        past_queries_str = "No past queries available."
+        
+    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level], past_queries=past_queries_str)
     return prompt
 
 
@@ -114,6 +133,7 @@ def api_get_chat_response():
     if request.method == 'POST':
         data = request.json 
         message_content = data.get('message_content')
+        append_query_history(message_content)
         help_level = data.get('help_level')
         # print(f'Help level: {help_level}')
         if message_content is None:
@@ -230,6 +250,28 @@ def append_message_history(role, message_content, emotions):
     with open("./agent_prompts/message_history.json", "w") as file:
         json.dump(message_history, file, indent=4)  # indent=4 for pretty formatting
     
+# Function to keep track of the raw user queries, to add memory to the agent
+def append_query_history(query):
+    """
+    Appends a user query to the query history JSON file.
+    """
+    file_path = "./agent_prompts/query_history.json"
+    
+    # Check if the file exists, if not, create it
+    if not os.path.exists(file_path):
+        query_history = []
+    else:
+        with open(file_path, "r") as file:
+            query_history = json.load(file)
+    
+    # Append the new query
+    query_history.append(query)
+    
+    # Save updated query history
+    with open(file_path, "w") as file:
+        json.dump(query_history, file, indent=4)
+
+
 def agent_stage(stage_number):
     """
     Changes the prompt for the Agent based on student's problem solving stage

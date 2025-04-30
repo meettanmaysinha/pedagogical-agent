@@ -4,6 +4,9 @@ breath and answer the question in an appropriate manner.
 Take note of the amount of guidance you should give (enclosed in <helpLevel> tags), and your appropriate emotional response (enclosed in <emotionResponse> tags).
 The user is currently feeling {user_emotion}
 
+Here are the most recent questions that the user has asked, from oldest to newest:
+{past_queries}
+
 <helpLevel> {help_level} </helpLevel>
 
 <userQuery> {user_question} </userQuery>

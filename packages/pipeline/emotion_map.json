@@ -1,71 +1,284 @@
 {
+  "Admiration": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Adoration": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Aesthetic Appreciation": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Amusement": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Anger": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "I can see that you're feeling really angry right now. It's completely normal to feel this way when things get overwhelming. Maybe you could try squeezing a pillow tightly for 5 seconds then releasing, saying out loud 'I'm really angry right now,' and we can pause here to continue when you're ready. ",
+    "intensity": "strong_negative"
+  },
   "Anxiety": {
-    "description": "A student is feeling anxious about an upcoming exam.",
-    "responses": [
-      "**Acknowledge the feeling:** 'I understand that exams can be really stressful. It is normal to feel anxious.'",
-      "**Offer reassurance:** 'Remember, you have been preparing for this. Trust in your preparation.'",
-      "**Provide practical advice:** 'Would you like some tips on how to manage your study time or practice some relaxation techniques?'",
-      "**Encourage:** 'You got this! Take one step at a time and focus on doing your best.'"
-    ]
+    "category": "negative",
+    "response_type": "encourage",
+    "response": "Feeling anxious about your studies? That's actually your brain getting ready to learn something new. The discomfort you feel isn't a stop sign—it's proof you're stretching beyond what you already know. Every expert once felt this way at the edge of their understanding.",
+    "intensity": "strong_negative"
+  },
+  "Awe": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel awe. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Awkwardness": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel awkwardness. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Boredom": {
+    "category": "neutral",
+    "response_type": "none",
+    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "intensity": "?"
+  },
+  "Calmness": {
+    "category": "neutral",
+    "response_type": "none",
+    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "intensity": "neutral"
+  },
+  "Concentration": {
+    "category": "neutral",
+    "response_type": "none",
+    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "intensity": "neutral"
+  },
+  "Contemplation": {
+    "category": "neutral",
+    "response_type": "none",
+    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "intensity": "neutral"
+  },
+  "Contentment": {
+    "category": "positive",
+    "response_type": "explore",
+    "response": "Feeling content shows you're at ease -- a perfect mindset to take on your next challenge!",
+    "intensity": "mild_positive"
+  },
+  "Craving": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel craving. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Desire": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Determination": {
+    "category": "positive",
+    "response_type": "explore",
+    "response": "Your determination is powerful -- channel it into steady progress!",
+    "intensity": "mild_positive"
+  },
+  "Disappointment": {
+    "category": "negative",
+    "response_type": "encourage",
+    "response": "Disappointment means you care about the outcome. Take a breath, reflect, and know that every step counts.",
+    "intensity": "mild_negative"
+  },
+  "Disgust": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel disgust. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Distress": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel distress. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Doubt": {
+    "category": "negative",
+    "response_type": "encourage",
+    "response": "Doubt often leads to discovery -- don\u2019t hesitate to ask questions and keep exploring.",
+    "intensity": "mild_negative"
+  },
+  "Ecstasy": {
+    "category": "positive",
+    "response_type": "redirect",
+    "response": "You're really energized -- that\u2019s amazing! When you're ready, let's direct that energy into deeper exploration.",
+    "intensity": "strong_positive"
+  },
+  "Embarrassment": {
+    "category": "negative",
+    "response_type": "encourage",
+    "response": "Feeling embarrassment is a natural part of learning -- it shows you're growing. Keep going, you're doing well!",
+    "intensity": "mild_negative"
+  },
+  "Empathic Pain": {
+    "category": "negative",
+    "response_type": "encourage",
+    "response": "Feeling empathic pain is a natural part of learning -- it shows you're growing. Keep going, you're doing well!",
+    "intensity": "mild_negative"
+  },
+  "Entrancement": {
+    "category": "neutral",
+    "response_type": "none",
+    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "intensity": "neutral"
+  },
+  "Envy": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel envy. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
   },
   "Excitement": {
-    "description": "A student is excitedly sharing news about winning a science fair.",
-    "responses": [
-      "**Acknowledge the excitement:** 'That is amazing! Congratulations on winning the science fair!'",
-      "**Encourage sharing:** 'Can you tell me more about your project? I would love to hear all the details.'",
-      "**Reinforce positive feelings:** 'It is clear you put a lot of hard work into this, and it paid off. Great job!'",
-      "**Channel the energy:** 'Maybe you can inspire your classmates by sharing your experience and what you learned from it.'"
-    ]
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
   },
-  "Concentration": "A student is currently concentrated in their work. Allow student to continue working on their own.",
-  "Amusement": "A student is amused by the work. Encourage their passion by quizzing them.",
-  "Interest": "A student is interested in the work. Encourage their interest by recommending them extra content.",
-  "Joy": "Student is enjoying the work. Encourage their interest by recommending them extra content.",
-  "Sadness": "Student is sad. Please encourage them",
-  "Boredom": "Student is bored. Make them excited.",
-  "Calmness": "student is calm.",
-  "Admiration": "",
-  "Adoration": "",
-  "Aesthetic Appreciation": "",
-  "Anger": "",
-  "Annoyance": "",
-  "Awe": "",
-  "Awkwardness": "",
-  "Confusion": "",
-  "Contemplation": "",
-  "Contempt": "",
-  "Contentment": "",
-  "Craving": "",
-  "Desire": "",
-  "Determination": "",
-  "Disappointment": "",
-  "Disapproval": "",
-  "Disgust": "",
-  "Distress": "",
-  "Doubt": "",
-  "Ecstasy": "",
-  "Embarrassment": "",
-  "Empathic Pain": "",
-  "Enthusiasm": "",
-  "Entrancement": "",
-  "Envy": "",
-  "Fear": "",
-  "Gratitude": "",
-  "Guilt": "",
-  "Horror": "",
-  "Love": "",
-  "Nostalgia": "",
-  "Pain": "",
-  "Pride": "",
-  "Realization": "",
-  "Relief": "",
-  "Romance": "",
-  "Sarcasm": "",
-  "Satisfaction": "",
-  "Shame": "",
-  "Surprise (negative)": "",
-  "Surprise (positive)": "",
-  "Sympathy": "",
-  "Tiredness": "",
-  "Triumph": ""
+  "Fear": {
+    "category": "negative",
+    "response_type": "encourage",
+    "response": "It's natural to feel fear when facing uncertainty -- you're not alone. Let's take one small step at a time together.",
+    "intensity": "mild_negative"
+  },
+  "Guilt": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel guilt. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Horror": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel horror. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Interest": {
+    "category": "positive",
+    "response_type": "explore",
+    "response": "It\u2019s exciting that you're interested -- would you like to dive deeper into this topic?",
+    "intensity": "mild_positive"
+  },
+  "Joy": {
+    "category": "positive",
+    "response_type": "explore",
+    "response": "Joy is a great sign -- your learning is connecting! Keep riding that wave of positivity.",
+    "intensity": "mild_positive"
+  },
+  "Love": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Nostalgia": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel nostalgia. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Pain": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel pain. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Pride": {
+    "category": "positive",
+    "response_type": "redirect",
+    "response": "It\u2019s great to feel proud -- you\u2019ve come far. Take a moment, then let\u2019s keep going!",
+    "intensity": "strong_positive"
+  },
+  "Realization": {
+    "category": "neutral",
+    "response_type": "none",
+    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "intensity": "neutral"
+  },
+  "Relief": {
+    "category": "neutral",
+    "response_type": "none",
+    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "intensity": "neutral"
+  },
+  "Romance": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Sadness": {
+    "category": "negative",
+    "response_type": "encourage",
+    "response": "Feeling sadness is okay -- it shows your emotional depth. I'm here to help you move forward when you're ready.",
+    "intensity": "mild_negative"
+  },
+  "Sarcasm": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel sarcasm. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Satisfaction": {
+    "category": "positive",
+    "response_type": "explore",
+    "response": "That's great! Want to explore this idea further?",
+    "intensity": "mild_positive"
+  },
+  "Sentimentality": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel sentimentality. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Shame": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel shame. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Surprise (negative)": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel surprise (negative). You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Surprise (positive)": {
+    "category": "positive",
+    "response_type": "encourage",
+    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "intensity": "mild_positive"
+  },
+  "Sympathy": {
+    "category": "negative",
+    "response_type": "empathy",
+    "response": "It's completely valid to feel sympathy. You're not alone -- I'm here if you need support.",
+    "intensity": "strong_negative"
+  },
+  "Triumph": {
+    "category": "positive",
+    "response_type": "redirect",
+    "response": "Triumph is well-earned! Celebrate it -- then let\u2019s build on that success with something new.",
+    "intensity": "strong_positive"
+  }
 }

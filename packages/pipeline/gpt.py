@@ -10,7 +10,18 @@ from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 from ml.rag.rag_helper import ip_search
-from pymilvus import MilvusClient, model
+from pymilvus import MilvusClient
+from sentence_transformers import SentenceTransformer
+import sys
+from datetime import datetime
+from collections import Counter
+
+# log_dir = "results/logs"
+# os.makedirs(log_dir, exist_ok=True)
+
+# log_filename = os.path.join(log_dir, f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+# log_file = open(log_filename, "w", encoding="utf-8")
+
 
 
 # Load the environment variables
@@ -32,11 +43,8 @@ config.read("./agent_prompts/config.ini")
 
 
 milvus_client = MilvusClient(uri="http://localhost:19530")
-embedding_fn =  model.dense.SentenceTransformerEmbeddingFunction(
-    model_name='cornstack/CodeRankEmbed',
-    device='cpu',
-    trust_remote_code=True  
-)
+embedding_fn = SentenceTransformer('cornstack/CodeRankEmbed', device='cpu', trust_remote_code=True)
+
 
 # Access agent conversation prompts
 prompts = "agentprompts"
@@ -75,11 +83,22 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     with open(prompt_file, "r", encoding="utf-8") as file:
         prompt = file.read()
         
-    user_emotions = ast.literal_eval(user_emotions)
+    # user_emotions = ast.literal_eval(user_emotions)
     emotional_response_map_str = ""
     
-    for emotion in user_emotions:
-        emotional_response_map_str += emotion_map[emotion]["response"]
+    # for emotion in user_emotions:
+    #     emotional_response_map_str += emotion_map[emotion]["response"]
+
+    if user_emotions in emotion_map:
+        response = emotion_map[user_emotions]["response"]
+        if isinstance(response, list):
+            emotional_response_map_str += "\n".join(response) + "\n"
+        elif isinstance(response, str):
+            emotional_response_map_str += response + "\n"
+        else:
+            emotional_response_map_str += f"[No valid response format for {user_emotions}]\n"
+    else:
+        emotional_response_map_str += f"[Emotion '{user_emotions}' not found in emotion_map]\n"
         
     code_examples_ls = ip_search([question],["text", "metadata"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
     code_examples=""
@@ -104,9 +123,9 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     else:
         past_queries_str = "No past queries available."
 
+    help_level="hint"  
 
-        
-    prompt = prompt.format(user_emotion=" and ".join(user_emotions),user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level], past_queries=past_queries_str)
+    prompt = prompt.format(user_emotion=user_emotions,user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level], past_queries=past_queries_str)
     return prompt
 
 
@@ -186,8 +205,22 @@ def get_chat_response(message_content, emotions):
     append_message_history("assistant", chat_completion.choices[0].message.content, None)
     
     append_query_history('response', chat_completion.choices[0].message.content)
+    
+    # response_content = chat_completion.choices[0].message.content 
+
+    # timestamp = datetime.now().isoformat()
+
+    # log_file.write(f"Timestamp: {timestamp}\n")
+    # log_file.write(f"Emotion: {emotions}\n\n")
+    # log_file.write("=== USER PROMPT ===\n")
+    # log_file.write(message_content + "\n\n")
+    # log_file.write("=== AGENT RESPONSE ===\n")
+    # log_file.write(response_content + "\n")
+    # log_file.write("="*60 + "\n\n")
+
 
     return chat_completion.choices[0].message.content
+
 
 def get_emotions():
     """
@@ -198,7 +231,49 @@ def get_emotions():
     try:
         aggregated_emotions = pd.read_csv("./results/aggregated_emotions.csv")
         student_emotions = aggregated_emotions[["occurring_emotions", "datetime"]]
-        return student_emotions.iloc[-1, 0]
+        if len(student_emotions) < 24:
+            recent_emotions = student_emotions["occurring_emotions"]
+        else:
+            recent_emotions = student_emotions["occurring_emotions"].tail(24)
+
+        # recent_emotions = student_emotions["occurring_emotions"].tail(24)
+        # return student_emotions.iloc[-1, 0]
+        
+        # raw_emotion = student_emotions.iloc[-1, 0]
+       
+        # emotion_list = ast.literal_eval(raw_emotion)
+
+        # if isinstance(emotion_list, list) and emotion_list:
+        #     return emotion_list[0]
+        # else:
+        #     return None
+    
+
+        all_emotions = []
+
+        for entry in recent_emotions:
+            try:
+                parsed = ast.literal_eval(entry)
+                if isinstance(parsed, list):
+                    all_emotions.extend(parsed)
+            except Exception:
+                continue  
+        if not all_emotions:
+            return None
+
+        # Count the occurrences of each emotion  
+        emotion_counter = Counter(all_emotions)
+        dominant_emotion, count = emotion_counter.most_common(1)[0]
+
+        #  # Log result
+        # timestamp = datetime.now().isoformat()
+        # log_file.write(f"[Emotion Detection] {timestamp}\n")
+        # log_file.write(f"Dominant Emotion: {dominant_emotion} (count={count})\n")
+        # log_file.write(f"All Emotion Counts: {dict(emotion_counter)}\n")
+        # log_file.write("=" * 50 + "\n\n")
+
+        return dominant_emotion
+        
     except FileNotFoundError:
         # If no emotions recorded
         return None

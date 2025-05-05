@@ -81,7 +81,9 @@ def ip_search(
         "tensorflow": ["tf", "keras", "estimator", "layers", "variable", "session", "model.fit", "sequential", "dense", "gpu"]
     }
 
-    query_vectors = embedding_fn.encode_documents(queries)
+    # query_vectors = embedding_fn.encode_documents(queries)
+    query_vectors = embedding_fn.encode(queries)
+
     res = client.search(
         collection_name=collection_name,
         data=query_vectors,

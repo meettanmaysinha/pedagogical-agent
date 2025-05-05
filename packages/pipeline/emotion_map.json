@@ -35,7 +35,6 @@
     "response": [
     "Share what's bothering you:Could you share what's bothering you most right now about this topic?",
     "Take a short break:Would a short break or a simpler exercise help before we tackle this again?",
-    "Choose the next step:Here are two paths we could take next—would you like to choose?",
     "Acknowledge and redirect:I know you've been working hard—sometimes anger means you care. Let's find a way to use that energy to get unstuck."
     ],
     "intensity": "strong_negative"
@@ -78,8 +77,9 @@
     "category": "low-arousal",
     "response_type": "re-engagement + pacing adjustment",
     "response": [
-      "Just checking in — would you like to try something a bit more challenging?", 
-      "Feeling a bit stuck? Maybe there's a new angle we could try together."
+      "Want to try something a bit more challenging?",
+      "Looks like this might be too easy — should we switch it up a little?",
+      "Let me know if you'd like to explore a different direction or dig a bit deeper!"
     ],
     "intensity": "neutral"
   },

@@ -19,51 +19,38 @@
   },
   "Amusement": {
     "category": "positive",
-    "response_type": "reinforcement + motivation",
     "response": [
-      "Acknowledge enjoyment: I'm glad you're finding this enjoyable — learning can definitely be fun!",
-      "Encourage continued engagement: Want to keep going while you're in such a good mood?",
-      "Connect emotion to learning: Sometimes a little amusement helps ideas stick better — let's build on that energy.",
-      "Prompt for reflection: What part did you find most amusing? Maybe we can explore it more deeply.",
-      "Support social sharing: If this made you smile, you could even share it with a friend — learning spreads that way too!"
+      "Feeling amused can lighten your mood and make learning more fun, but too much distraction can keep you from finishing your problem-solving task. Try to enjoy the moment while staying on task"
     ],
     "intensity": "mild_positive"
   },
   "Anger": {
     "category": "negative",
-    "response_type": "empathy + redirection",
     "response": [
-    "Share what's bothering you:Could you share what's bothering you most right now about this topic?",
-    "Take a short break:Would a short break or a simpler exercise help before we tackle this again?",
-    "Acknowledge and redirect:I know you've been working hard—sometimes anger means you care. Let's find a way to use that energy to get unstuck."
+    "Feeling angry can show that something isn't right and motivate you to make a change in your understanding of the problem or your solution approach, but it can also make it hard to think clearly. Use that energy to focus on solving the problem, but take a moment to calm down if you need to."
     ],
     "intensity": "strong_negative"
   },
   "Anxiety": {
     "category": "negative",
-    "response_type": "soothing + reassurance",
-    "response":[ "Offer emotional support: It's okay to feel anxious — learning something new can be challenging.",
-      "Encourage slowing down: Would you like to take this one step at a time? We can go at your pace.",
-      "Validate the emotion: That anxious feeling shows you're taking this seriously — that matters.",
-      "Suggest grounding: How about we take a deep breath together and then look at it again calmly?"
+    "response":[ 
+      "Feeling anxious can show you care about doing well, but too much anxiety can make it hard to focus. Use that energy to identify what's bothering you and tackle it step by step as you navigate this problem-solving task."
     ],
     "intensity": "strong_negative"
   },
   "Annoyance": {
     "category": "negative",
-    "response_type": "recognition + expression",
     "response": [
-       "Recognize the feeling: It seems like something is bothering you — would you like to tell me what's getting in   the way?",
-       "Prompt outward expression: Sometimes naming the frustrating part helps — what's the part that's annoying you the most?",
-       "Re-engage through control: Would you like to pick the next step? Taking the lead might help things feel less frustrating."],
+       "This sense of annoyance can indicate a need for change. A different approach to this problem might work better - let's explore new strategies, but be cautious that it doesn't lead to frustration that clouds your problem-solving judgment",
+       "Sometimes naming the frustrating part helps — what's the part that's annoying you the most?"
+         ],
     "intensity": "strong_negative"
   },
   "Awe": {
     "category": "positive",
-    "response_type": "curiosity + guidance",
     "response": [
-      "Support curiosity: If something caught your attention, we can take a closer look together.",
-      "Subtle encouragement: Sounds like you noticed something meaningful — would you like to dig a bit deeper?"
+      "Feeling a sense of awe can spark your curiosity and excitement; use that feeling to explore new ideas in this problem-solving task or dive deeper into what interests you about creating and justifying new solutions.",
+      "Interesting moments like this often lead to valuable insights."
     ],
     "intensity": "strong_negative"
   },
@@ -75,41 +62,35 @@
   },
   "Boredom": {
     "category": "low-arousal",
-    "response_type": "re-engagement + pacing adjustment",
     "response": [
-      "Want to try something a bit more challenging?",
-      "Looks like this might be too easy — should we switch it up a little?",
-      "Let me know if you'd like to explore a different direction or dig a bit deeper!"
+      "Feeling bored can mean this problem-solving task is either too easy or too hard - which one is it? are you under-challenged or over-challenged? if the former, you can try making the task more interesting by adding new unconventional solution ideas. if the latter, try breaking the problem into smaller parts to tackle one step at a time."
     ],
     "intensity": "neutral"
   },
   "Calmness": {
     "category": "neutral",
-    "response_type": "none",
-    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "response_type": "ignore",
+    "response": "No intervention needed",
     "intensity": "neutral"
   },
   "Confusion": {
     "category": "negative",
-    "response_type": "encouragement",
     "response": [
-      "Sounds like something isn't quite clear — want to go over it together step by step?",
-      "That's totally fine — is there a specific part that's confusing? I can break it down.", 
-      "It's okay not to get it right away. We can take a closer look together if you'd like.",
-      "Would you like to try another example or hear it explained in a different way?",
-      "No pressure — we can slow down and take another look whenever you're ready."],
+      "Feeling confused means you need more clarity; take a moment to break down the problem and ask questions to help you understand better.s",
+      "This feeling of uncertainty often comes before a deeper understanding of the problem - let's use this as an opportunity to clarify your thinking about the problem."
+    ],
     "intensity": "neutral"
   },
   "Concentration": {
     "category": "neutral",
-    "response_type": "none",
-    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "response_type": "ignore",
+    "response": "",
     "intensity": "neutral"
   },
   "Contemplation": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "response": "No intervention needed",
     "intensity": "neutral"
   },
   "Contentment": {
@@ -132,42 +113,33 @@
   },
   "Determination": {
     "category": "positive",
-    "response_type": "explore",
-    "response": "Your determination is powerful -- channel it into steady progress!",
+    "response_type": "ignore",
+    "response": "No intervention needed",
     "intensity": "mild_positive"
   },
   "Disappointment": {
     "category": "negative",
-    "response_type": "reassurance + encouragement",
     "response": [
-      "Reframe perspective:It's okay to feel a bit let down. Do you want to try looking at it from a different angle together?",
-      "Normalize effort:Sometimes progress doesn't feel immediate — but every step still counts.",
-      "Encourage retry:You've been putting in the effort, and that matters. Want to give it another go?",
-      "Allow pause:We can pause or retry when you're ready — learning is full of ups and downs."
+      "Every attempt gives us valuable information for the next try.",
+      "Even though things didn't go as planned, let's look at what we've learned that can help us move forward in similar problem-solving tasks.",
+      "Sometimes the path to the solution isn't straightforward, but each step teaches us something."
     ],
     "intensity": "strong_negative"
   },
   "Disapproval": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "It's completely valid to feel disapproval. You're not alone -- I'm here if you need support.",
+    "response": "No intervention needed",
     "intensity": "strong_negative"
   },
   "Disgust": {
     "category": "negative",
-    "response_type": "recognition",
-    "response": [
-      "Acknowledge discomfort: It seems like something about this is really off-putting — want to share what didn't sit right?",
-      "Offer distance: We can step back from this topic if it's bothering you and try something else.",
-      "Empower choice: Would you like to pick a different area or approach that feels more comfortable?",
-      "Redirect attention: Let's shift focus for now — we can come back to this when it feels better.",
-      "Normalize response: It's totally valid to feel that way — not everything clicks right away, and that's okay."
-    ],
+    "response": 
+      "Is something off? Let's explore what's causing this feeling to gain clarity and figure out what needs to change or improve.",
     "intensity": "strong_negative"
   },
   "Distress": {
     "category": "negative",
-    "response_type": "soothing + safety",
     "response": [
       "Provide reassurance: I'm here for you — we can pause or slow things down if you're feeling overwhelmed.",
       "Validate feelings: That sounds really tough — it's okay to feel this way sometimes.",
@@ -182,28 +154,23 @@
     "category": "negative",
     "response_type": "encourage",
     "response": [
-      "Encourage exploration: It's okay to not be certain — we can explore the idea together and see what we find.",
-      "Reinforce effort: Asking questions is part of learning — it means you're thinking critically.",
-      "Support small steps: We can test your thinking step by step if that feels safer.",
-      "Normalize uncertainty: Doubt is natural — it often means you're close to understanding something new."
+      "Feeling unsure can help you ask questions and think more deeply; just make sure it doesn't stop you from taking action.",
+      "Questioning the process is actually part of good problem-solving.",
+      "What specific part seems uncertain? We can focus there first.",
+      "Asking questions is part of learning — it means you’re thinking critically."
     ],
     "intensity": "mild_negative"
   },
   "Ecstasy": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "do not need to intervene -- you're in a positive emotional state. Just continue your work as usual.",
+    "response": "do not need to intervene.",
     "intensity": "strong_positive"
   },
   "Embarrassment": {
     "category": "negative",
-    "response_type": "normalization + emotional safety",
     "response": 
-  [
-    "Normalize reaction: That's a totally normal feeling — we all make mistakes when we're learning.",
-    "Reduce pressure: No worries at all — this is a safe space to try things out.",
-    "Encourage continuation: Want to keep going at your own pace? There's no need to rush or get it perfect."
-  ],
+    "Feeling embarrassed can show you care about doing well; it's okay to make mistakes—use them as a chance to learn and grow.",
     "intensity": "mild_negative"
   },
   "Empathic Pain": {
@@ -214,18 +181,16 @@
   },
   "Enthusiasm": {
     "category": "positive",
-    "response_type": "acknowledgement + gentle encouragement",
     "response": [
-    "Acknowledge energy: Love the energy — let's keep that momentum going!",
-    "Support continuation: Great to see you this engaged. Ready to tackle the next part?",
-    "Encourage self-driven pace: You seem excited — feel free to dive right in when you're ready."
+    "High engagement can drive momentum and creativity, but let's also check in to ensure we're staying focused on our problem-solving objectives for this task.",
+    "Great to see you this engaged. Let's continue learning."
     ],
     "intensity": "mild_positive"
   },
   "Entrancement": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "response": "No intervention needed",
     "intensity": "neutral"
   },
   "Envy": {
@@ -236,11 +201,9 @@
   },
   "Excitement": {
     "category": "positive",
-    "response_type": "light encouragement + focus support",
     "response": [
-      "Support focus: Let's keep the momentum going while you're in the zone.",
-      "Encourage flow: Ready to ride that energy into the next part?"
-    ],
+      "Let's keep the momentum going while you're in the zone.",
+      "Feeling excited can help you dive into your work; just make sure to stay focused so you can get things done."],
     "intensity": "mild_positive"
   },
   "Fear": {
@@ -257,12 +220,8 @@
   },
   "Guilt": {
     "category": "negative",
-    "response_type": "emotional relief + self-compassion",
-    "response": [
-      "Relieve pressure: It's okay — mistakes happen and they're part of how we learn.",
-      "Encourage self-kindness: Try not to be too hard on yourself. You're doing your best.",
-      "Support reset: Let's take a deep breath and move forward from here, one step at a time."
-    ],
+    "response": 
+      "A desire to improve can motivate us to take action, but it's important to recognize when that feeling becomes counterproductive - just remember to focus on what you can improve instead of being hard on yourself.",
     "intensity": "strong_negative"
   },
   "Horror": {
@@ -273,18 +232,13 @@
   },
   "Interest": {
     "category": "positive",
-    "response_type": "support engagement + encourage exploration",
-    "response": [
-      "Acknowledge focus: Looks like this caught your attention — want to explore it a bit further?",
-      "Encourage deepening: Great to see you're interested — ready to dive a little deeper?",
-      "Support flow: You seem really engaged — let's keep going while that interest is fresh."
-    ],
+    "response": 
+      "A deep curiosity can enhance our learning experience, yet it's important to stay aware of distractions that might pull us away from the problem-solving task at hand.",
     "intensity": "mild_positive"
   },
   "Joy": {
     "category": "positive",
-    "response_type": "acknowledgement",
-    "response": "Encourage rhythm: Great — we can keep the momentum going whenever you're ready.",
+    "response":"Experiencing joy in our progress can enhance motivation, but let's also remain aware of problem-solving challenges that may need addressing.",
     "intensity": "mild_positive"
   },
   "Love": {
@@ -296,7 +250,7 @@
   "Nostalgia": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "It's completely valid to feel nostalgia. You're not alone -- I'm here if you need support.",
+    "response": "No intervention needed",
     "intensity": "strong_negative"
   },
   "Pain": {
@@ -307,23 +261,20 @@
   },
   "Pride": {
     "category": "positive",
-    "response_type": "acknowledgement + steady progression",
-    "response": [
-      "Support steady pace: That was a solid step — let’s continue at your pace.",
-      "Maintain momentum: You're making progress — ready for the next part when you are."
-    ],
+    "response": 
+      "Recognizing your achievements during problem-solving can boost confidence, but it's also vital to remain humble and open to continued learning.",
     "intensity": "strong_positive"
   },
   "Realization": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "response": "No intervention needed",
     "intensity": "neutral"
   },
   "Relief": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed -- you're in a neutral emotional state. Just continue your work as usual.",
+    "response": "No intervention needed",
     "intensity": "neutral"
   },
   "Romance": {
@@ -334,14 +285,8 @@
   },
   "Sadness": {
     "category": "negative",
-    "response_type": "emotional support + strategy suggestion",
-    "response": [
-    "Concentration: If it helps, we can just focus on one small part of the task right now — no need to take on everything at once.",
-    "Reappraisal: It's okay if today feels harder than usual. Learning isn't always about doing more — sometimes it's about showing up.",
-    "Situation selection: Would it feel better to switch to a simpler topic for now? You can always come back when you're ready.",
-    "Outward expression: If you want to let me know how you're feeling or what's getting in the way, I'm here to listen."
-
-    ],
+    "response": 
+    "Feeling down can help you think more deeply about what you're learning; it's important to acknowledge how you feel and use that reflection to improve.",
     "intensity": "mild_negative"
   },
   "Sarcasm": {
@@ -364,32 +309,22 @@
   },
   "Shame": {
     "category": "negative",
-    "response_type": "self-compassion + recovery strategies",
-    "response": [
-      "Concentration: Let's try focusing on just one step — we don't need to do everything at once.",
-      "Reappraisal: It's okay to feel off.",
-      "Situation selection: If this part feels like too much right now, we can come back to it later or try something else."
-    ],
+    "response": 
+      "Facing problem-solving areas needing growth can be challenging, but it's important to approach them with compassion and an open mind.",
     "intensity": "strong_negative"
   },
   "Surprise (negative)": {
     "category": "negative",
-    "response_type": "grounding + pacing + reassurance",
-    "response": [
-      "Contextual grounding: That might've caught you off guard — want a quick summary of what just happened?",
-      "Cognitive buffering: That was unexpected — no worries, we can slow it down from here.",
-      "Pacing control: We can pause for a second or move ahead step by step — your call."
-    ],
+    "response": 
+    [
+      "Unexpected outcomes can challenge our assumptions, yet they may also lead to discomfort that we need to navigate thoughtfully",
+      "Unexpected results often teach us the most."],
     "intensity": "strong_negative"
   },
   "Surprise (positive)": {
     "category": "positive",
-    "response_type": "light acknowledgement",
-    "response": [
-      "That was a nice surprise — want to keep going?",
-      "Looks like that clicked — feel free to continue.",
-      "Didn't expect that? Let's see where it leads."
-    ],
+    "response": 
+      "Positive surprises can enhance our learning experience; let's reflect on what made it work to replicate that problem-solving success in the future.",
     "intensity": "mild_positive"
   },
   "Sympathy": {
@@ -400,18 +335,13 @@
   },
   "Triedness": {
     "category": "negative",
-    "response_type": "fatigue support + pacing control",
-    "response": [
-      "You've been working for a while — want to take a short break?",
-    "It's okay to pause for a moment if you need to recharge.",
-    "We can slow things down or come back later — it's up to you"
-    ],
+    "response": 
+      "Feeling fatigued can signal the need for rest, but recognizing when to push through can also lead to problem-solving breakthroughs.",
     "intensity": "strong_negative"
   },
   "Triumph": {
     "category": "positive",
-    "response_type": "light acknowledgement",
-    "response":  "That was a big step — ready for what's next?",
+    "response":  "Recognizing effective strategies can boost confidence; let's also remember to remain humble and learn from each experience.",
     "intensity": "strong_positive"
   }
 }

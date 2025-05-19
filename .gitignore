@@ -19,8 +19,10 @@ packages/DUMP/video_recorder.py
 packages/DUMP/AVRecorder.py
 recordings/av_output/av_timestamps.json
 message_history.json
+query_history.json
 /env
 /ml/evaluation/result/trial_*
+/logs
 
 # Do not ignore
 !prompt_examples.csv

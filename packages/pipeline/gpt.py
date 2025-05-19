@@ -121,7 +121,7 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     else:
         past_queries_str = "No past queries available."
 
-    help_level="hint"  
+    # help_level="hint"  
 
     prompt = prompt.format(user_emotion=user_emotions,user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level], past_queries=past_queries_str)
     return prompt

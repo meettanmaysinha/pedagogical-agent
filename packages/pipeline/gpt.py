@@ -16,13 +16,11 @@ import sys
 from datetime import datetime
 from collections import Counter
 
-# log_dir = "results/logs"
-# os.makedirs(log_dir, exist_ok=True)
+# Log file to store all the timestamps and what happened
+log_dir = "logs"
+os.makedirs(log_dir, exist_ok=True)
 
-# log_filename = os.path.join(log_dir, f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
-# log_file = open(log_filename, "w", encoding="utf-8")
-
-
+log_filename = os.path.join(log_dir, f"log_{datetime.now().strftime('%Y%m%d_%H%M')}.jsonl")
 
 # Load the environment variables
 load_dotenv()
@@ -123,7 +121,7 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     else:
         past_queries_str = "No past queries available."
 
-    help_level="hint"  
+    # help_level="hint"  
 
     prompt = prompt.format(user_emotion=user_emotions,user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level], past_queries=past_queries_str)
     return prompt
@@ -158,6 +156,7 @@ def api_get_chat_response():
         data = request.json 
         message_content = data.get('message_content')
         help_level = data.get('help_level')
+        drag_and_drop = data.get('drag_and_drop')
         # print(f'Help level: {help_level}')
         if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
@@ -165,6 +164,25 @@ def api_get_chat_response():
         prompt = generate_prompt(question=message_content,prompt_file=package_dir / 'prompt.md', user_emotions=emotions, help_level=help_level)
         append_query_history('query', message_content)
         response = get_chat_response(prompt, emotions)
+        
+        # Update log entry with relevant information
+        log_entry = {
+            "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+            "user_query": message_content,
+            "dominant_emotion": emotions,
+            "help_level": help_level,
+            "help_level_reasoning": data.get("help_level_reasoning"),
+            "agent_response": response,
+            "drag_and_drop": drag_and_drop
+        }
+
+        # Append to .jsonl file
+        with open(log_filename, "a") as log_file:
+            json.dump(log_entry, log_file)
+            log_file.write("\n")
+
+        
+        
         return jsonify({"response": response}), 200
 
 def read_examples_from_csv(file_path):
@@ -194,7 +212,7 @@ def get_chat_response(message_content, emotions):
         ],
         top_p=None,
         temperature=None,
-        max_tokens=300,
+        max_tokens=600,
         stream=False,
         seed=None,
         frequency_penalty=None,
@@ -305,20 +323,21 @@ def get_message_history():
 def append_message_history(role, message_content, emotions):
     """
     Adds messages to the chat history
-    """
-    # Check if the file exists, if not, create it with preset prompts
-    try:
-        # Load message history from JSON file
-        with open("./agent_prompts/message_history.json", "r") as file:
+    """     
+    message_history_path = "./agent_prompts/message_history.json"
+    
+    # If file exists and is not empty
+    if os.path.exists(message_history_path) and os.path.getsize(message_history_path) > 0:
+        with open(message_history_path, "r") as file:
             message_history = json.load(file)
-    except FileNotFoundError:
+    else:
         # Create file with preset prompts
         message_history = [
             {"role":"system", "content":initial_agent_prompt},
             {"role":"system", "content":"You may use these examples as guidance: \n" + str(read_examples_from_csv(FEW_SHOT_PATH))},
             {"role":"user","content": student_prompt}
         ]
-        with open("./agent_prompts/message_history.json", "w") as file:
+        with open(message_history_path, "w") as file:
             json.dump(message_history, file)
 
     if role == "assistant":
@@ -345,7 +364,7 @@ def append_query_history(message_type, content):
     file_path = "./agent_prompts/query_history.json"
     
     # Load existing history or initialize empty list
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         query_history = []
     else:
         with open(file_path, "r") as file:

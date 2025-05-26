@@ -104,6 +104,9 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     for i,code_ex in enumerate(code_examples_ls):
         code_examples += f"Example {i+1}:\n {code_ex} \n\n"
     
+    if len(code_examples_ls) == 0:
+        code_examples = "No relevant code examples found in the database."
+        
     # Read the past 3 queries
     try:
         with open("./agent_prompts/query_history.json", "r") as file:
@@ -123,7 +126,7 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
 
     # help_level="hint"  
 
-    prompt = prompt.format(user_emotion=user_emotions,user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level_map[help_level], past_queries=past_queries_str)
+    prompt = prompt.format(user_emotion=user_emotions,user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level, help_level_map=help_level_map[help_level], past_queries=past_queries_str)
     return prompt
 
 

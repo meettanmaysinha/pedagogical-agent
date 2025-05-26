@@ -1,6 +1,6 @@
 {
-  "default": "Briefly point the student toward a relevant concept or area to review. Avoid giving direct answers or detailed reasoning, but provide enough context to help them move forward on their own.",
-  "hint": "Provide a small clue or point out a possible mistake or concept to revisit. Do not give away the full answer or detailed reasoning.",
+  "default": "Provide a small clue or point out a possible mistake or concept to revisit. Do not give away the full answer or detailed reasoning. DO NOT give code examples.",
+  "hint": "Provide a small clue or point out a possible mistake or concept to revisit. Do not give away the full answer or detailed reasoning. DO NOT give code examples.",
   "guided": "Guide the student through the problem step-by-step with explanations. Include partial code or reasoning, but leave some steps for the student to complete on their own.",
   "comprehensive": "Give a complete and detailed answer with full code or explanation. Clearly explain the reasoning behind each step and ensure the student can understand the full solution."
 }

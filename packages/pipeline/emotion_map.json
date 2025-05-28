@@ -169,6 +169,7 @@
   },
   "Embarrassment": {
     "category": "negative",
+     "response_type": "ignore",
     "response": 
     "Feeling embarrassed can show you care about doing well; it's okay to make mistakes—use them as a chance to learn and grow.",
     "intensity": "mild_negative"

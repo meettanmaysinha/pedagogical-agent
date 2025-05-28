@@ -124,8 +124,6 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
     else:
         past_queries_str = "No past queries available."
 
-    # help_level="hint"  
-
     prompt = prompt.format(user_emotion=user_emotions,user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level, help_level_map=help_level_map[help_level], past_queries=past_queries_str)
     return prompt
 
@@ -207,10 +205,17 @@ def get_chat_response(message_content, emotions):
     # print(message_content)
     # print("---------------------------------------------------------------------------")
     client = OpenAI(base_url=TEXT_TO_CODE_API_URL, api_key=HF_TOKEN)
+
+    system_instruction = (
+        "You are Qwen, an expert in data science designed to help users with their data science related coding questions."
+        "You must respond in a structured way: "
+        "(1) Start with an emotionally guided introduction." 
+        "(2) provide your reply. "
+    )
     chat_completion = client.chat.completions.create(
         model="tgi",
         messages=[
-            {"role": "system", "content": "You are Qwen, an expert in data science designed to help users with their data science related coding questions."},
+            {"role": "system", "content": system_instruction},
             {"role": "user", "content": message_content},
         ],
         top_p=None,
@@ -227,20 +232,9 @@ def get_chat_response(message_content, emotions):
     
     append_query_history('response', chat_completion.choices[0].message.content)
     
-    # response_content = chat_completion.choices[0].message.content 
-
-    # timestamp = datetime.now().isoformat()
-
-    # log_file.write(f"Timestamp: {timestamp}\n")
-    # log_file.write(f"Emotion: {emotions}\n\n")
-    # log_file.write("=== USER PROMPT ===\n")
-    # log_file.write(message_content + "\n\n")
-    # log_file.write("=== AGENT RESPONSE ===\n")
-    # log_file.write(response_content + "\n")
-    # log_file.write("="*60 + "\n\n")
-
-
     return chat_completion.choices[0].message.content
+
+# _emotion_index = 0
 
 
 def get_emotions():
@@ -249,6 +243,21 @@ def get_emotions():
 
     Retrieves emotions from aggregated_emotions.csv, where the fused emotions are stored
     """
+    # global _emotion_index
+
+    # if testing_mode:    
+    #     # In testing mode, we use a fixed emotion for demonstration purposes
+    #     emotions_list=["Doubt","Doubt","Anxiety","Disappointment","Disappointment","Confusion","Sadness","Excitement","Amusement","Interest","Amusement"]
+        
+    #     # Get the current emotion to return
+    #     current_emotion = emotions_list[_emotion_index]
+
+    #      # Update the index for next call, cycling back to 0 when needed
+    #     _emotion_index = (_emotion_index + 1) % len(emotions_list)
+
+
+    #     return current_emotion
+
     try:
         aggregated_emotions = pd.read_csv("./results/aggregated_emotions.csv")
         student_emotions = aggregated_emotions[["occurring_emotions", "datetime"]]
@@ -256,19 +265,6 @@ def get_emotions():
             recent_emotions = student_emotions["occurring_emotions"]
         else:
             recent_emotions = student_emotions["occurring_emotions"].tail(24)
-
-        # recent_emotions = student_emotions["occurring_emotions"].tail(24)
-        # return student_emotions.iloc[-1, 0]
-        
-        # raw_emotion = student_emotions.iloc[-1, 0]
-       
-        # emotion_list = ast.literal_eval(raw_emotion)
-
-        # if isinstance(emotion_list, list) and emotion_list:
-        #     return emotion_list[0]
-        # else:
-        #     return None
-    
 
         all_emotions = []
 
@@ -286,12 +282,6 @@ def get_emotions():
         emotion_counter = Counter(all_emotions)
         dominant_emotion, count = emotion_counter.most_common(1)[0]
 
-        #  # Log result
-        # timestamp = datetime.now().isoformat()
-        # log_file.write(f"[Emotion Detection] {timestamp}\n")
-        # log_file.write(f"Dominant Emotion: {dominant_emotion} (count={count})\n")
-        # log_file.write(f"All Emotion Counts: {dict(emotion_counter)}\n")
-        # log_file.write("=" * 50 + "\n\n")
 
         return dominant_emotion
         

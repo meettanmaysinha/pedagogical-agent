@@ -22,7 +22,9 @@ message_history.json
 query_history.json
 /env
 /ml/evaluation/result/trial_*
-/logs
+/results
+/venv
 
 # Do not ignore
 !prompt_examples.csv
+node_modules

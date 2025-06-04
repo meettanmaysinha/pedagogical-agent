@@ -208,9 +208,7 @@ def get_chat_response(message_content, emotions):
 
     system_instruction = (
         "You are Qwen, an expert in data science designed to help users with their data science related coding questions."
-        "You must respond in a structured way: "
-        "(1) Start with an emotionally guided introduction." 
-        "(2) provide your reply. "
+        # "You must Start with an emotionally guided introduction."       
     )
     chat_completion = client.chat.completions.create(
         model="tgi",
@@ -247,8 +245,10 @@ def get_emotions():
 
     # if testing_mode:    
     #     # In testing mode, we use a fixed emotion for demonstration purposes
-    #     emotions_list=["Doubt","Doubt","Anxiety","Disappointment","Disappointment","Confusion","Sadness","Excitement","Amusement","Interest","Amusement"]
+    #     # emotions_list=["Doubt","Doubt","Anxiety","Disappointment","Disappointment","Confusion","Sadness","Excitement","Amusement","Interest","Amusement"]
         
+    #     emotions_list=["Calmness","Calmness","Boredom","Boredom","Consentration","Consentration","Sadness","Excitement","Amusement","Interest","Amusement"]
+
     #     # Get the current emotion to return
     #     current_emotion = emotions_list[_emotion_index]
 

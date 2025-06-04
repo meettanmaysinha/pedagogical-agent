@@ -2,19 +2,19 @@
   "Admiration": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Adoration": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Aesthetic Appreciation": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Amusement": {
@@ -57,7 +57,7 @@
   "Awkwardness": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "It's completely valid to feel awkwardness. You're not alone -- I'm here if you need support.",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Boredom": {
@@ -70,7 +70,7 @@
   "Calmness": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "neutral"
   },
   "Confusion": {
@@ -90,31 +90,31 @@
   "Contemplation": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "neutral"
   },
   "Contentment": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "Feeling content shows you're at ease -- a perfect mindset to take on your next challenge!",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Craving": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "It's completely valid to feel craving. You're not alone -- I'm here if you need support.",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Desire": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Determination": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Disappointment": {
@@ -129,7 +129,7 @@
   "Disapproval": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Disgust": {
@@ -157,14 +157,14 @@
       "Feeling unsure can help you ask questions and think more deeply; just make sure it doesn't stop you from taking action.",
       "Questioning the process is actually part of good problem-solving.",
       "What specific part seems uncertain? We can focus there first.",
-      "Asking questions is part of learning — it means you’re thinking critically."
+      "Asking questions is part of learning — it means you're thinking critically."
     ],
     "intensity": "mild_negative"
   },
   "Ecstasy": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "do not need to intervene.",
+    "response": "",
     "intensity": "strong_positive"
   },
   "Embarrassment": {
@@ -177,7 +177,7 @@
   "Empathic Pain": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "Feeling empathic pain is a natural part of learning -- it shows you're growing. Keep going, you're doing well!",
+    "response": "",
     "intensity": "mild_negative"
   },
   "Enthusiasm": {
@@ -191,13 +191,13 @@
   "Entrancement": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "neutral"
   },
   "Envy": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Excitement": {
@@ -210,13 +210,13 @@
   "Fear": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "mild_negative"
   },
   "Gratitude": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Guilt": {
@@ -228,7 +228,7 @@
   "Horror": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Interest": {
@@ -245,19 +245,19 @@
   "Love": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Nostalgia": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Pain": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Pride": {
@@ -269,19 +269,19 @@
   "Realization": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "neutral"
   },
   "Relief": {
     "category": "neutral",
     "response_type": "ignore",
-    "response": "No intervention needed",
+    "response": "",
     "intensity": "neutral"
   },
   "Romance": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "It seems like you're in a comfortable and engaged learning state. Stay calm and focused -- and feel free to challenge yourself further!",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Sadness": {
@@ -293,19 +293,19 @@
   "Sarcasm": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Satisfaction": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "mild_positive"
   },
   "Sentimentality": {
     "category": "negative",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Shame": {
@@ -331,7 +331,7 @@
   "Sympathy": {
     "category": "positive",
     "response_type": "ignore",
-    "response": "No intervention needed ",
+    "response": "",
     "intensity": "strong_negative"
   },
   "Triedness": {

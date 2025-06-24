@@ -5,10 +5,16 @@ Flask==3.0.3
 Flask-Cors==4.0.1
 hume==0.4.1
 numpy==1.26.2
-openai==1.35.3
+openai==1.90.0
 opencv-python==4.8.1.78
 pandas==2.1.4
 PyAudio==0.2.12
 pydub==0.25.1
 python-dotenv==1.0.1
 streamlit==1.35.0
+transformers==4.52.4
+pymilvus==2.5.11
+pymupdf==1.26.1
+einops==0.8.1
+sentence_transformers
+"hume[stream]"

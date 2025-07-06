@@ -17,4 +17,5 @@ pymilvus==2.5.11
 pymupdf==1.26.1
 einops==0.8.1
 sentence_transformers
-"hume[stream]"
+hume
+langchain

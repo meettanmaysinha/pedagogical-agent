@@ -1,10 +1,63 @@
+# Git
+.git
+.gitignore
+
+# Docker specific files
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+
+# Python virtual environments (covers .venv, .venv1, etc.)
 .venv
-__pycache__
+venv
+env/
+venv*/
+.venv*
+
+# Python cache and compiled files
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Environment and secrets files
 .env
 *.env
+
+# Log files
 *.log
-.venv1
-.venv11
+logs/
+
+# Large data, models, or notebooks that shouldn't be in the image
+# Add your specific directories or file extensions here!
+data/
+models/
+notebooks/
+*.pth
+*.pt
+*.onnx
+*.bin
+
+# IDE and editor configuration
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Testing and linting artifacts
+.pytest_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+
+# Build artifacts
+build/
+dist/
+*.egg-info
+
+recordings/

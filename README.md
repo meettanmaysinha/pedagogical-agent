@@ -77,7 +77,7 @@ The application requires access to your system's audio and video hardware. This 
     *   Wait a minute or two for the services to initialize. You can check their status with `docker compose ps`.
 2. Set up the database 
       ```
-      python db_set_up.py
+      python ./ml/rag/db_set_up.py
       ```
 3.  **Activate your Python Virtual Environment:**
     ```sh

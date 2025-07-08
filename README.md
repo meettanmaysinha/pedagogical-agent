@@ -28,10 +28,12 @@ The application requires access to your system's audio and video hardware. This 
     *   **Windows:** May require downloading pre-compiled wheels or using a package manager like Chocolatey (`choco install portaudio`).
     *   **macOS:** `brew install portaudio` (using Homebrew).
     *   **Linux (Debian/Ubuntu):** `sudo apt-get update && sudo apt-get install portaudio19-dev`.
-*   **For Video/Audio Processing (OpenCV, pydub):** Often requires FFmpeg.
+*   **For Video/Audio Processing (OpenCV, pydub):** Requires FFmpeg.
     *   **Windows:** Follow [these](https://phoenixnap.com/kb/ffmpeg-windows) instructions to download and add to PATH.
     *   **macOS:** `brew install ffmpeg` (using Homebrew).
     *   **Linux (Debian/Ubuntu):** `sudo apt-get update && sudo apt-get install ffmpeg`.
+*   **For downloading numpy / other C++ based libraries:** Requires Visual Studio.
+    *   **Windows:** Download Visual Studio - Community Version and ensure it is not in preview mode. Under workloads, find Desktop Development with C++ and install the MSVC and the Windows SDK you need (10 or 11).
 
 ### Installation
 
@@ -45,11 +47,11 @@ The application requires access to your system's audio and video hardware. This 
 4.  **Install Python:** If you don't have Python 3.11+, download and install it.
 5.  **Create and Activate a Python Virtual Environment (Recommended):**
     ```sh
-    python -m venv venv
+    python -m venv .venv
     # On Windows:
-    .\venv\Scripts\activate
+    .\.venv\Scripts\activate
     # On macOS/Linux:
-    source venv/bin/activate
+    source .venv/bin/activate
     ```
 6.  **Install Python Packages:** Ensure your virtual environment is activated before running this.
     ```sh

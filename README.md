@@ -44,7 +44,7 @@ The application requires access to your system's audio and video hardware. This 
     ```
 2.  **Install Docker Desktop:** If you don't have it, download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/). Ensure it's running.
 3.  **Install Java:** The pattern mining component requires Java. Install the latest OpenJDK or Java Runtime Environment (JRE) for your system.
-4.  **Install Python:** If you don't have Python 3.11+, download and install it.
+4.  **Install Python 3.11:** If you don't have Python 3.11, download and install it.
 5.  **Create and Activate a Python Virtual Environment (Recommended):**
     ```sh
     python -m venv .venv

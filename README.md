@@ -3,7 +3,7 @@
 
 ### Introduction
 
-This Pedagogical Agent is designed to provide adaptive scaffolding through the introduction of emotional analysis and response generation using Large Language Models (LLMs). This documentation is your comprehensive guide to making the most of our application.
+This Pedagogical Agent is designed to provide adaptive scaffolding through the introduction of emotional analysis and response generation using Large Language Models (LLMs). The application consists of a Python component that handles webcam/microphone input, LLM interaction, and pattern mining, and a Milvus vector database running in Docker for efficient data storage and retrieval. This documentation is your comprehensive guide to making the most of the application.
 
 For development, refer to the Development section at the end of this README
 
@@ -11,36 +11,104 @@ For development, refer to the Development section at the end of this README
 
 Here are some of the key features of the Pedagogical Agent:
 
-- **Feature 1**: Emotions Analysis
+- **Feature 1**: Emotions Analysis (using webcam and microphone)
 - **Feature 2**: Response Generation with LLMs
+- **Feature 3**: Milvus Vector Database for efficient data handling
 - **And More (In development)**: Pattern Mining of Results
 
 ### Prerequisites
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)   						![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+
+**Other Required System Dependencies (Platform Dependent):**
+The application requires access to your system's audio and video hardware. This typically requires installing underlying libraries for PyAudio and OpenCV.
+
+*   **For Audio (PyAudio):** Often requires PortAudio. Instructions vary by OS.
+    *   **Windows:** May require downloading pre-compiled wheels or using a package manager like Chocolatey (`choco install portaudio`).
+    *   **macOS:** `brew install portaudio` (using Homebrew).
+    *   **Linux (Debian/Ubuntu):** `sudo apt-get update && sudo apt-get install portaudio19-dev`.
+*   **For Video/Audio Processing (OpenCV, pydub):** Requires FFmpeg.
+    *   **Windows:** Follow [these](https://phoenixnap.com/kb/ffmpeg-windows) instructions to download and add to PATH.
+    *   **macOS:** `brew install ffmpeg` (using Homebrew).
+    *   **Linux (Debian/Ubuntu):** `sudo apt-get update && sudo apt-get install ffmpeg`.
+*   **For downloading numpy / other C++ based libraries:** Requires Visual Studio.
+    *   **Windows:** Download Visual Studio - Community Version and ensure it is not in preview mode. Under workloads, find Desktop Development with C++ and install the MSVC and the Windows SDK you need (10 or 11).
 
 ### Installation
 
-1. Install Python packages
-   ```sh
-   $ pip install -r requirements.txt
-   ```
+1.  **Clone the Repository:**
+    ```sh
+    git clone https://github.com/meettanmaysinha/pedagogical-agent
+    cd pedagogical-agent
+    ```
+2.  **Install Docker Desktop:** If you don't have it, download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/). Ensure it's running.
+3.  **Install Java:** The pattern mining component requires Java. Install the latest OpenJDK or Java Runtime Environment (JRE) for your system.
+4.  **Install Python 3.11:** If you don't have Python 3.11, download and install it.
+5.  **Create and Activate a Python Virtual Environment (Recommended):**
+    ```sh
+    python -m venv .venv
+    # On Windows:
+    .\.venv\Scripts\activate
+    # On macOS/Linux:
+    source .venv/bin/activate
+    ```
+6.  **Install Python Packages:** Ensure your virtual environment is activated before running this.
+    ```sh
+    pip install -r requirements.txt
+    ```
+7.  **Install System Dependencies for Audio/Video:** Follow the instructions under "Prerequisites" for your specific operating system to install PortAudio and FFmpeg.
+8.  **Create and Configure the `.env` file:**
+    *   Create a file named `.env` in the project root directory.
+    *   Add your API keys:
+      ```
+      HUME_API_KEY='your_hume_api_key'
+      OPENAI_API_KEY='your_openai_api_key'
+      ```
+      *(Replace the placeholder values with your actual API keys).*
 
-2. Install FFmpeg on your device
+<!-- Usage -->
+## Usage
 
-   #### MacOS (Homebrew required):
-   ```sh
-   brew install ffmpeg
-   ```
+1.  **Start the Milvus Database (using Docker Compose):**
+    *   Open your terminal or command prompt in the project root directory (where `docker-compose.yml` is located).
+    *   Run the following command to start the Milvus services in the background (`-d`):
+        ```sh
+        docker compose up -d etcd minio standalone
+        ```
+    *   Wait a minute or two for the services to initialize. You can check their status with `docker compose ps`.
+2. Set up the database 
+      ```
+      python ./ml/rag/db_set_up.py
+      ```
+3.  **Activate your Python Virtual Environment:**
+    ```sh
+    # On Windows:
+    .\venv\Scripts\activate
+    # On macOS/Linux:
+    source venv/bin/activate
+    ```
+4.  **Run the Pedagogical Agent Application:**
+    *   Ensure you are in the project root directory.
+    *   Ensure your virtual environment is activated.
+    *   Run the main script:
+        ```sh
+        python streammain.py
+        ```
+        *(By default, this streams both audio and video. You can specify the mode using the `--mode` option like `python streammain.py --mode audio`)*
+5.  Allow access to Camera and the video feed should start (if running in 'video' or 'both' mode).
+6.  While the video feed is running, emotion predictions (via the Hume API, using the Milvus database running in Docker) will be processed. Results will be printed and/or saved as configured in your script.
+7.  Recordings will be saved at fixed intervals into the `./recordings` folder.
 
-   #### For Windows, follow [these](https://phoenixnap.com/kb/ffmpeg-windows) instructions
+#### Closing the Application
 
-3. Create a file called `.env`
-   
-   ```py
-   HUME_API_KEY = 'HUME_API_KEY'
-   OPENAI_API_KEY = 'OPENAI_API_KEY'
-   ```
-   *API Keys to be reset before deployment, .env to be added to .gitignore*
+1.  To stop the Python application script (including the webcam feed and Flask server thread), press `Ctrl+C` in the terminal where `python streammain.py` is running. You may need to press it more than once.
+2.  To stop the Milvus Docker containers (recommended when you are done using the application), run the following command in the project root directory:
+    ```sh
+    docker compose down etcd minio standalone
+    ```
+    *(Alternatively, `docker compose down` will stop and remove all services and the network defined in the `docker-compose.yml`.)*
+
 
 <!-- Scripts -->
 ## Main Scripts
@@ -50,6 +118,7 @@ Here are some of the key features of the Pedagogical Agent:
    ```sh
    python streammain.py
    ```
+
    By default, the program streams both audio and video. You can specify the mode using the --mode option. The available modes are:
    * audio
    * video
@@ -65,15 +134,6 @@ Here are some of the key features of the Pedagogical Agent:
    * Video recording will be saved in `./recordings/video` 
    * Audio recording will be saved in `./recordings/audio`
    * Combined recording will be saved in `./recordings/av_output`
-
-#### Closing the Webcam program
-
-1. To close the Webcam Stream, press 'Q' on the keyboard
-
-2. Then run the following command in the command line
-   ```sh
-   npx kill-port 8000
-   ```
 
 ### Batch Upload
    ```sh
@@ -130,8 +190,6 @@ Here are some of the key features of the Pedagogical Agent:
 6. Sequences will be extracted into `extracted_sequence.txt` and encoded using Emotion IDs in `emotions_dict.py` 
 7. To close the video feed, press 'Q' on your keyboard
 8. Sequence mining algorithm will then run and output will be printed in `output_sequence.txt`
-
-
 
 <!-- Recordings -->
 ## Recordings

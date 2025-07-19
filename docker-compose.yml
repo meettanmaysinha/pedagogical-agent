@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # --- Milvus Services (Copied from ml\rag\docker-compose.yml) ---
+  etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.0
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    networks: # <-- Add this
+      - milvus
+
+  minio:
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2020-12-03T00-03-10Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
+    command: minio server /minio_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks: # <-- Add this
+      - milvus
+
+  standalone: # <-- This is the Milvus service name
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.4.10
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379 # These use service names!
+      MINIO_ADDRESS: minio:9000 # These use service names!
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
+    ports:
+      - "19530:19530" # Mapping 19530 to host (optional for app, good for external access)
+    depends_on:
+      - "etcd"
+      - "minio"
+    networks: # <-- Add this
+      - milvus
+
+  # --- Your Application Service (from your new docker-compose.yml) ---
+  app: # Your application service name (was 'pedagogical-agent-app-1' in logs)
+    # Note: container_name is usually not needed in compose unless you
+    # have a specific reason, as Compose names are predictable.
+    # container_name: pedagogical-agent-app-1
+    build: ./docker # Path to your Dockerfile directory relative to this compose file
+    image: final_backend
+    ports:
+      - "8501:8501" # Map your app's port
+      # You might also need to map other ports your app uses, e.g., for voice
+      # - "5000:5000" # Example for Flask/别的 services
+    env_file:
+      - .env # Assumes .env is in the project root
+    volumes:
+       # This maps your project root code into the container.
+       # Adjust if your structure is different.
+      - .:/usr/src/app
+    working_dir: /usr/src/app # Set working directory inside container
+    command: [ "python", "streammain.py" ] # Explicitly set command
+    depends_on: # <-- Add this to wait for Milvus
+       - "standalone"
+    networks: # <-- THIS IS CRITICAL - Put app on the same network as Milvus
+      - milvus
+    devices:
+      # Map host audio devices (standard Linux path)
+      - "/dev/snd:/dev/snd"
+      # Map host video devices (common Linux path for webcam 0)
+      - "/dev/video0:/dev/video0"
+      # If you have multiple cameras, you might need to map others like /dev/video1, /dev/video2 etc.
+      # or attempt to map the whole directory (less common):
+      # - "/dev/video:/dev/video"
+
+    # Add this to grant the container necessary permissions for device access
+    # WARNING: 'privileged: true' grants extensive capabilities.
+    # Use this for testing/development. For production, explore 'cap_add'
+    # with specific capabilities like SYS_RAWIO, IPC_LOCK, SYS_NICE if possible.
+    privileged: true
+
+# --- Network Definition (Copied from ml\rag\docker-compose.yml) ---
+networks:
+  milvus:
+    name: milvus

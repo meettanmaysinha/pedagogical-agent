@@ -24,6 +24,7 @@ query_history.json
 /ml/evaluation/result/trial_*
 /results
 /venv
+.venv*
 
 # Do not ignore
 !prompt_examples.csv

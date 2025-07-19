@@ -15,6 +15,7 @@ from sentence_transformers import SentenceTransformer
 import sys
 from datetime import datetime
 from collections import Counter
+from transformers import AutoTokenizer
 
 # Log file to store all the timestamps and what happened
 log_dir = "logs"
@@ -99,14 +100,23 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
         emotional_response_map_str += f"[Emotion '{user_emotions}' not found in emotion_map]\n"
         
     code_examples_ls = ip_search([question],["text", "metadata"], "collection_demo", embedding_fn=embedding_fn, client=milvus_client)
-    code_examples=""
+    # code_examples=""
     
-    for i,code_ex in enumerate(code_examples_ls):
-        code_examples += f"Example {i+1}:\n {code_ex} \n\n"
+    # for i,code_ex in enumerate(code_examples_ls):
+    #     code_examples += f"Example {i+1}:\n {code_ex} \n\n"
     
-    if len(code_examples_ls) == 0:
+    # if len(code_examples_ls) == 0:
+    #     code_examples = "No relevant code examples found in the database."
+
+    if help_level in ["default", "hint"]:
         code_examples = "No relevant code examples found in the database."
-        
+    else:
+        code_examples = ""
+        for i, code_ex in enumerate(code_examples_ls):
+            code_examples += f"Example {i+1}:\n {code_ex} \n\n"
+        if not code_examples_ls:
+            code_examples = "No relevant code examples found in the database."
+            
     # Read the past 3 queries
     try:
         with open("./agent_prompts/query_history.json", "r") as file:
@@ -125,6 +135,43 @@ def generate_prompt(question, user_emotions, help_level, prompt_file="prompt.md"
         past_queries_str = "No past queries available."
 
     prompt = prompt.format(user_emotion=user_emotions,user_question=question, code_examples=code_examples, emotional_response_map=emotional_response_map_str, help_level=help_level, help_level_map=help_level_map[help_level], past_queries=past_queries_str)
+
+    # tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen1.5-7B-Chat", trust_remote_code=True)
+    # print("Token count of final prompt:", len(tokenizer(prompt)["input_ids"]))
+
+    # === Optional: check prompt size ===
+
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen1.5-7B-Chat", trust_remote_code=True)
+
+    input_ids = tokenizer(prompt)["input_ids"]
+    token_count = len(input_ids)
+
+    # print("="*60)
+    # print(f"[Prompt Debug] Total token count: {token_count}")
+    # print(f"[Prompt Debug] Number of past queries included: {len(past_queries)}")
+    # print(f"[Prompt Debug] Prompt Preview:\n{prompt[:2000]}...")
+    # print("="*60)
+    
+
+    # # Create logs/prompts folder if not exist
+    # prompt_log_dir = os.path.join(log_dir, "prompts")
+    # os.makedirs(prompt_log_dir, exist_ok=True)
+
+    # # Construct filename with timestamp
+    # prompt_log_filename = os.path.join(
+    #     prompt_log_dir,
+    #     f"prompt_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    # )
+
+    # # Write token count and full prompt to the file
+    # with open(prompt_log_filename, "w", encoding="utf-8") as f:
+    #     f.write(f"[Token Count]: {token_count}\n\n")
+    #     f.write(prompt)
+
+    # print(f"[Prompt Debug] Prompt log saved to: {prompt_log_filename}")
+
+
+
     return prompt
 
 
@@ -157,8 +204,10 @@ def api_get_chat_response():
         data = request.json 
         message_content = data.get('message_content')
         help_level = data.get('help_level')
+        execution_count=data.get('execution_count')
+        error_count=data.get('error_count')
+        error_interval=data.get('error_interval')
         drag_and_drop = data.get('drag_and_drop')
-        # print(f'Help level: {help_level}')
         if message_content is None:
             return jsonify({"error": "Missing required parameters"}), 400
         emotions = get_emotions()
@@ -171,6 +220,9 @@ def api_get_chat_response():
             "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
             "user_query": message_content,
             "dominant_emotion": emotions,
+            "execution_count": execution_count,
+            "error_count": error_count,
+            "error_interval": error_interval,
             "help_level": help_level,
             "help_level_reasoning": data.get("help_level_reasoning"),
             "agent_response": response,
@@ -232,10 +284,10 @@ def get_chat_response(message_content, emotions):
     
     return chat_completion.choices[0].message.content
 
+
 # _emotion_index = 0
 
-
-def get_emotions():
+def get_emotions(testing_mode=True):
     """
     Gets last occurring emotion
 
@@ -245,9 +297,7 @@ def get_emotions():
 
     # if testing_mode:    
     #     # In testing mode, we use a fixed emotion for demonstration purposes
-    #     # emotions_list=["Doubt","Doubt","Anxiety","Disappointment","Disappointment","Confusion","Sadness","Excitement","Amusement","Interest","Amusement"]
-        
-    #     emotions_list=["Calmness","Calmness","Boredom","Boredom","Consentration","Consentration","Sadness","Excitement","Amusement","Interest","Amusement"]
+    #     emotions_list=["Boredom","Boredom","Annoyance","Awe","Sadness","Disappointment","Anxiety","Distress","Enthusiasm","Guilt","Joy","Triedness","Surprise (negative)"]
 
     #     # Get the current emotion to return
     #     current_emotion = emotions_list[_emotion_index]

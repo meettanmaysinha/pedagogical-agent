@@ -287,7 +287,7 @@ def get_chat_response(message_content, emotions):
 
 # _emotion_index = 0
 
-def get_emotions(testing_mode=True):
+def get_emotions():
     """
     Gets last occurring emotion
 
